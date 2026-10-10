@@ -1,0 +1,40 @@
+{
+  "id": "gratitude",
+  "name": "الشكر والحمد",
+  "icon": "favorite",
+  "subcategories": [
+    {
+      "id": "gratitude_general",
+      "name": "شكر الله والحمد على النعم",
+      "items": [
+        {
+          "id": "gratitude_01",
+          "arabicText": "الْحَمْدُ لِلَّهِ الَّذِي بِنِعْمَتِهِ تَتِمُّ الصَّالِحَاتُ",
+          "translation": "تُقال عند حصول أمر طيّب أو سماع خبر سار.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "عند سماع ما يَسُرّ أو حصول نعمة",
+          "tags": ["شكر", "حمد", "خبر سار"],
+          "sources": [{"sourceName": "سنن ابن ماجه", "authenticity": "hasan"}]
+        },
+        {
+          "id": "gratitude_02",
+          "arabicText": "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
+          "translation": "حمد الله على نعمه عامة.",
+          "repeatCount": {"type": "open"},
+          "occasion": "حمد عام في أي وقت",
+          "tags": ["شكر", "حمد"],
+          "sources": [{"sourceName": "القرآن الكريم", "collection": "سورة الفاتحة: 2", "authenticity": "quran"}]
+        },
+        {
+          "id": "gratitude_03",
+          "arabicText": "رَبِّ أَوْزِعْنِي أَنْ أَشْكُرَ نِعْمَتَكَ الَّتِي أَنْعَمْتَ عَلَيَّ وَعَلَى وَالِدَيَّ، وَأَنْ أَعْمَلَ صَالِحًا تَرْضَاهُ",
+          "translation": "دعاء قرآني بطلب التوفيق للشكر والعمل الصالح.",
+          "repeatCount": {"type": "open"},
+          "occasion": "طلب التوفيق للشكر",
+          "tags": ["شكر"],
+          "sources": [{"sourceName": "القرآن الكريم", "collection": "سورة النمل: 19", "authenticity": "quran"}]
+        }
+      ]
+    }
+  ]
+}

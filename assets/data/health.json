@@ -1,0 +1,72 @@
+{
+  "id": "health",
+  "name": "الصحة والمرض",
+  "icon": "healing",
+  "subcategories": [
+    {
+      "id": "visiting_sick",
+      "name": "زيارة المريض والدعاء له",
+      "items": [
+        {
+          "id": "health_01",
+          "arabicText": "لَا بَأْسَ، طَهُورٌ إِنْ شَاءَ اللَّهُ",
+          "translation": "يقال للمريض تطييبًا لقلبه، مع الدعاء له بالشفاء؛ وهو تطمين وليس تشخيصًا طبيًا.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "عند زيارة المريض",
+          "tags": ["مرض", "زيارة المريض"],
+          "sources": [{"sourceName": "صحيح البخاري", "hadithNumber": "3616", "authenticity": "sahih"}],
+          "medicalDisclaimer": true
+        },
+        {
+          "id": "health_02",
+          "arabicText": "أَسْأَلُ اللَّهَ الْعَظِيمَ أَنْ يَشْفِيَكَ",
+          "translation": "دعاء للمريض عند زيارته.",
+          "repeatCount": {"type": "fixed", "n": 7},
+          "occasion": "دعاء للمريض بالشفاء",
+          "tags": ["مرض", "زيارة المريض", "شفاء"],
+          "sources": [{"sourceName": "سنن أبي داود والترمذي", "authenticity": "hasan"}],
+          "medicalDisclaimer": true
+        },
+        {
+          "id": "health_03",
+          "arabicText": "اللَّهُمَّ رَبَّ النَّاسِ، أَذْهِبِ الْبَاسَ، اشْفِ أَنْتَ الشَّافِي، لَا شِفَاءَ إِلَّا شِفَاؤُكَ، شِفَاءً لَا يُغَادِرُ سَقَمًا",
+          "translation": "دعاء الشفاء الذي كان النبي صلى الله عليه وسلم يرقي به المرضى.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "الرقية بالدعاء للمريض",
+          "tags": ["مرض", "رقية", "شفاء"],
+          "isRuqyah": true,
+          "sources": [{"sourceName": "صحيح البخاري ومسلم", "authenticity": "sahih"}],
+          "medicalDisclaimer": true
+        }
+      ]
+    },
+    {
+      "id": "pain_ruqyah",
+      "name": "الرقية عند الألم",
+      "items": [
+        {
+          "id": "health_04",
+          "arabicText": "بِسْمِ اللَّهِ",
+          "translation": "توضع اليد على موضع الألم من الجسد وتقال 3 مرات، ثم: أعوذ بالله وقدرته من شر ما أجد، 7 مرات.",
+          "repeatCount": {"type": "fixed", "n": 3},
+          "occasion": "عند الشعور بألم في الجسد — رقية الذات، لا تُستخدم كبديل عن العلاج الطبي",
+          "tags": ["ألم", "رقية"],
+          "isRuqyah": true,
+          "sources": [{"sourceName": "صحيح مسلم", "hadithNumber": "2202", "authenticity": "sahih"}],
+          "medicalDisclaimer": true
+        },
+        {
+          "id": "health_05",
+          "arabicText": "أَعُوذُ بِاللَّهِ وَقُدْرَتِهِ مِنْ شَرِّ مَا أَجِدُ",
+          "translation": "تُقال بعد وضع اليد على موضع الألم وقول 'بسم الله' ثلاثًا.",
+          "repeatCount": {"type": "fixed", "n": 7},
+          "occasion": "عند الشعور بألم في الجسد — رقية الذات، لا تُستخدم كبديل عن العلاج الطبي",
+          "tags": ["ألم", "رقية"],
+          "isRuqyah": true,
+          "sources": [{"sourceName": "صحيح مسلم", "hadithNumber": "2202", "authenticity": "sahih"}],
+          "medicalDisclaimer": true
+        }
+      ]
+    }
+  ]
+}

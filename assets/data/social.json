@@ -1,0 +1,94 @@
+{
+  "id": "social",
+  "name": "المناسبات الاجتماعية",
+  "icon": "people",
+  "subcategories": [
+    {
+      "id": "sneezing",
+      "name": "العطاس",
+      "items": [
+        {
+          "id": "social_01",
+          "arabicText": "الْحَمْدُ لِلَّهِ",
+          "translation": "يقولها العاطس بعد العطاس.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "بعد العطاس",
+          "tags": ["عطاس"],
+          "sources": [{"sourceName": "صحيح البخاري", "hadithNumber": "6224", "authenticity": "sahih"}]
+        },
+        {
+          "id": "social_02",
+          "arabicText": "يَرْحَمُكَ اللَّهُ",
+          "translation": "يقولها من يسمع العاطس يحمد الله، تشميتًا له.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "تشميت العاطس بعد سماعه يحمد الله",
+          "tags": ["عطاس", "تشميت"],
+          "sources": [{"sourceName": "صحيح البخاري", "hadithNumber": "6224", "authenticity": "sahih"}]
+        },
+        {
+          "id": "social_03",
+          "arabicText": "يَهْدِيكُمُ اللَّهُ وَيُصْلِحُ بَالَكُمْ",
+          "translation": "رد العاطس على من شمّته بـ 'يرحمك الله'.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "رد العاطس على المُشمِّت",
+          "tags": ["عطاس"],
+          "sources": [{"sourceName": "صحيح البخاري", "hadithNumber": "6224", "authenticity": "sahih"}]
+        }
+      ]
+    },
+    {
+      "id": "greeting",
+      "name": "السلام والدعاء لمن أحسن إليك",
+      "items": [
+        {
+          "id": "social_04",
+          "arabicText": "السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ",
+          "translation": "تحية الإسلام الكاملة بين المسلمين.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "عند لقاء المسلم",
+          "tags": ["سلام", "لقاء"],
+          "sources": [{"sourceName": "سنن أبي داود والترمذي", "authenticity": "hasan"}]
+        },
+        {
+          "id": "social_05",
+          "arabicText": "جَزَاكَ اللَّهُ خَيْرًا",
+          "translation": "دعاء لمن أحسن إليك أو قدّم لك معروفًا.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "لمن صنع إليك معروفًا",
+          "tags": ["شكر الناس", "معروف"],
+          "sources": [{"sourceName": "سنن الترمذي", "authenticity": "hasan"}]
+        }
+      ]
+    },
+    {
+      "id": "anger",
+      "name": "عند الغضب",
+      "items": [
+        {
+          "id": "social_06",
+          "arabicText": "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ",
+          "translation": "يُقال عند الغضب؛ ويُستحب مع ذلك الجلوس إن كان قائمًا، والاستلقاء إن لم يسكن الغضب بالجلوس.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "عند الغضب",
+          "tags": ["غضب"],
+          "sources": [{"sourceName": "صحيح البخاري", "hadithNumber": "6115", "authenticity": "sahih"}]
+        }
+      ]
+    },
+    {
+      "id": "news",
+      "name": "عند سماع ما يسر أو يكره",
+      "items": [
+        {
+          "id": "social_07",
+          "arabicText": "قَدَّرَ اللَّهُ وَمَا شَاءَ فَعَلَ",
+          "translation": "يُقال عند حدوث ما لا يُرضي، بدلًا من قول 'لو أني فعلت كذا لكان كذا'، لأن 'لو' تفتح عمل الشيطان.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "عند حدوث أمر غير مرغوب",
+          "tags": ["خبر مكروه", "قدر"],
+          "sources": [{"sourceName": "صحيح مسلم", "hadithNumber": "2664", "authenticity": "sahih"}]
+        }
+      ]
+    }
+  ]
+}

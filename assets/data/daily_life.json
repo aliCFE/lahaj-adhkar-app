@@ -1,0 +1,151 @@
+{
+  "id": "daily_life",
+  "name": "الحياة اليومية",
+  "icon": "home",
+  "subcategories": [
+    {
+      "id": "home",
+      "name": "دخول المنزل والخروج منه",
+      "items": [
+        {
+          "id": "home_01",
+          "arabicText": "بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا، وَعَلَى اللَّهِ رَبِّنَا تَوَكَّلْنَا",
+          "translation": "يقال عند دخول المنزل، ثم يُسلِّم على أهله.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "عند دخول المنزل",
+          "tags": ["منزل", "بيت", "دخول المنزل"],
+          "sources": [{"sourceName": "سنن أبي داود", "hadithNumber": "5096", "authenticity": "hasan"}]
+        },
+        {
+          "id": "home_02",
+          "arabicText": "بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
+          "translation": "من قالها حين يخرج من بيته قيل له: كُفيت، ووُقيت، وهُديت، وتنحّى عنه الشيطان.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "عند الخروج من المنزل",
+          "tags": ["منزل", "بيت", "الخروج من المنزل"],
+          "sources": [{"sourceName": "سنن أبي داود والترمذي", "authenticity": "sahih"}]
+        }
+      ]
+    },
+    {
+      "id": "bathroom",
+      "name": "دخول الخلاء والخروج منه",
+      "items": [
+        {
+          "id": "bathroom_01",
+          "arabicText": "بِسْمِ اللَّهِ، اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخُبُثِ وَالْخَبَائِثِ",
+          "translation": "استعاذة من الشياطين الذكور والإناث.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "عند دخول الخلاء",
+          "tags": ["خلاء", "حمام"],
+          "sources": [{"sourceName": "صحيح البخاري ومسلم", "authenticity": "sahih"}]
+        },
+        {
+          "id": "bathroom_02",
+          "arabicText": "غُفْرَانَكَ",
+          "translation": "طلب المغفرة من الله.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "عند الخروج من الخلاء",
+          "tags": ["خلاء", "حمام"],
+          "sources": [{"sourceName": "سنن أبي داود والترمذي وابن ماجه", "authenticity": "hasan"}]
+        }
+      ]
+    },
+    {
+      "id": "food",
+      "name": "الطعام",
+      "items": [
+        {
+          "id": "food_01",
+          "arabicText": "بِسْمِ اللَّهِ",
+          "translation": "تُقال قبل الطعام.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "قبل الطعام",
+          "tags": ["طعام", "أكل"],
+          "sources": [{"sourceName": "سنن أبي داود والترمذي", "authenticity": "hasan"}]
+        },
+        {
+          "id": "food_02",
+          "arabicText": "بِسْمِ اللَّهِ أَوَّلَهُ وَآخِرَهُ",
+          "translation": "تُقال إذا نسي أن يُسمِّي في أول الطعام فتذكر وهو يأكل.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "إذا نُسيت البسملة في أول الطعام",
+          "tags": ["طعام", "أكل"],
+          "sources": [{"sourceName": "سنن أبي داود والترمذي", "authenticity": "hasan"}]
+        },
+        {
+          "id": "food_03",
+          "arabicText": "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هٰذَا، وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلَا قُوَّةٍ",
+          "translation": "شكر الله على الطعام بعد الفراغ منه.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "بعد الطعام",
+          "tags": ["طعام", "أكل"],
+          "sources": [{"sourceName": "سنن أبي داود والترمذي وابن ماجه", "authenticity": "hasan"}]
+        }
+      ]
+    },
+    {
+      "id": "drink",
+      "name": "الشراب",
+      "items": [
+        {
+          "id": "drink_01",
+          "arabicText": "اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَزِدْنَا مِنْهُ",
+          "translation": "دعاء كان النبي صلى الله عليه وسلم يقوله بعد شرب اللبن خاصة.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "بعد شرب اللبن",
+          "tags": ["شراب", "لبن"],
+          "sources": [{"sourceName": "سنن أبي داود والترمذي", "authenticity": "hasan"}]
+        }
+      ]
+    },
+    {
+      "id": "clothing",
+      "name": "ارتداء الملابس وخلعها",
+      "items": [
+        {
+          "id": "clothing_01",
+          "arabicText": "الْحَمْدُ لِلَّهِ الَّذِي كَسَانِي هٰذَا، وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلَا قُوَّةٍ",
+          "translation": "تُقال عند ارتداء ثوب جديد.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "عند ارتداء ثوب جديد",
+          "tags": ["ملابس", "لباس"],
+          "sources": [{"sourceName": "سنن أبي داود وابن ماجه", "authenticity": "hasan"}]
+        },
+        {
+          "id": "clothing_02",
+          "arabicText": "بِسْمِ اللَّهِ",
+          "translation": "ستر ما بين أعين الجن وعورات بني آدم أن يقول أحدهم: بسم الله، عند خلع ثيابه.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "عند خلع الملابس",
+          "tags": ["ملابس", "لباس"],
+          "sources": [{"sourceName": "سنن الترمذي", "authenticity": "hasan"}]
+        }
+      ]
+    },
+    {
+      "id": "guest",
+      "name": "الضيف ومن أحسن إليك",
+      "items": [
+        {
+          "id": "guest_01",
+          "arabicText": "اللَّهُمَّ أَطْعِمْ مَنْ أَطْعَمَنِي، وَاسْقِ مَنْ أَسْقَانِي",
+          "translation": "دعاء لمن قدّم لك طعامًا أو شرابًا.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "دعاء الضيف لمن أحسن إليه بالطعام والشراب",
+          "tags": ["ضيف", "طعام"],
+          "sources": [{"sourceName": "صحيح مسلم", "hadithNumber": "2055", "authenticity": "sahih"}]
+        },
+        {
+          "id": "guest_02",
+          "arabicText": "أَفْطَرَ عِنْدَكُمُ الصَّائِمُونَ، وَأَكَلَ طَعَامَكُمُ الْأَبْرَارُ، وَصَلَّتْ عَلَيْكُمُ الْمَلَائِكَةُ",
+          "translation": "دعاء الضيف الصائم لأهل البيت الذين أفطر عندهم.",
+          "repeatCount": {"type": "fixed", "n": 1},
+          "occasion": "دعاء الصائم عند إفطاره في بيت غيره",
+          "tags": ["ضيف", "صيام"],
+          "sources": [{"sourceName": "سنن أبي داود وابن ماجه", "authenticity": "hasan"}]
+        }
+      ]
+    }
+  ]
+}
