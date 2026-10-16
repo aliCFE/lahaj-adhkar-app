@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/dhikr_item.dart';
 import '../theme/icon_map.dart';
 import 'all_adhkar_screen.dart';
+import 'divine_names_screen.dart';
 import 'group_screen.dart';
 import 'quran_index_screen.dart';
 import 'reader_screen.dart';
@@ -116,6 +117,37 @@ class HomeScreen extends StatelessWidget {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const QuranIndexScreen()),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Material(
+            color: const Color(0xFF181B3A),
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const DivineNamesScreen()),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    Icon(Icons.auto_awesome_rounded, color: Color(0xFFE8C27A)),
+                    SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('أسماء الله الحسنى', style: TextStyle(color: Color(0xFFE8C27A), fontWeight: FontWeight.bold)),
+                          Text('٩٩ اسمًا، مع الشرح ومواضع ورودها في القرآن', style: TextStyle(color: Color(0xFFB9BBD8), fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.arrow_back_ios_new, size: 16, color: Color(0xFFE8C27A)),
+                  ],
+                ),
               ),
             ),
           ),
