@@ -15,6 +15,25 @@ const double _kMushafFontSize = 19;
 const double _kMushafLineHeight = 2.3;
 const double _kBasmalaFontSize = 20;
 
+/// The Quran text data embeds the Basmala as a literal prefix in every
+/// surah's ayah 1 (except At-Tawbah, which has none) — e.g. ayah 2:1 is
+/// "بسم الله الرحمن الرحيم الم". Mushaf Mode renders its own standalone
+/// Basmala line above the text, so that embedded copy is stripped out of
+/// the displayed ayah text to avoid showing it twice. The prefix is taken
+/// from Al-Fatiha's ayah 1 (which *is* exactly the Basmala) rather than
+/// retyped, so it is guaranteed to match the data's exact text byte for
+/// byte, diacritics included.
+String? _basmalaPrefixCache;
+String get _basmalaPrefix =>
+    _basmalaPrefixCache ??= QuranRepository.instance.ayahsForSurah(1).first.text;
+
+String _mushafAyahText(QuranAyah a) {
+  if (a.ayahNumber == 1 && a.surahNumber != 1 && a.text.startsWith(_basmalaPrefix)) {
+    return a.text.substring(_basmalaPrefix.length).trimLeft();
+  }
+  return a.text;
+}
+
 class QuranReaderScreen extends StatefulWidget {
   const QuranReaderScreen({super.key, required this.initialPage});
 
@@ -267,7 +286,7 @@ class _QuranPageView extends StatelessWidget {
                                 style: style,
                                 children: [
                                   for (final a in segment) ...[
-                                    TextSpan(text: a.text),
+                                    TextSpan(text: _mushafAyahText(a)),
                                     WidgetSpan(
                                       alignment: PlaceholderAlignment.middle,
                                       child: Padding(
