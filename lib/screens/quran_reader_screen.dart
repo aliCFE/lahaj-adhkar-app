@@ -287,27 +287,19 @@ class _QuranPageView extends StatelessWidget {
                                 children: [
                                   for (final a in segment) ...[
                                     TextSpan(text: _mushafAyahText(a)),
-                                    WidgetSpan(
-                                      alignment: PlaceholderAlignment.middle,
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                                        child: Container(
-                                          width: 24,
-                                          height: 24,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            border: Border.all(color: const Color(0xFFB08D57), width: 1.2),
-                                            color: a.isSajda ? const Color(0x33B08D57) : null,
-                                          ),
-                                          child: Text(
-                                            toEasternDigits(a.ayahNumber),
-                                            style: const TextStyle(fontSize: 10.5, color: Color(0xFFB08D57)),
-                                          ),
-                                        ),
+                                    // A plain-text marker, not a WidgetSpan: Flutter
+                                    // can misplace WidgetSpans relative to their
+                                    // surrounding text in justified RTL paragraphs
+                                    // (flutter/flutter#111381), which showed up here
+                                    // as ayah-end circles landing on the wrong ayah.
+                                    // ۩ marks a sajda ayah, matching print convention.
+                                    TextSpan(
+                                      text: ' ﴾${toEasternDigits(a.ayahNumber)}${a.isSajda ? '۩' : ''}﴿ ',
+                                      style: const TextStyle(
+                                        color: Color(0xFFB08D57),
+                                        fontSize: 13,
                                       ),
                                     ),
-                                    const TextSpan(text: ' '),
                                   ],
                                 ],
                               ),
