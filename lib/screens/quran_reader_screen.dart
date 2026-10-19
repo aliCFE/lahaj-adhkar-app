@@ -294,7 +294,7 @@ class _QuranPageView extends StatelessWidget {
                                     // as ayah-end circles landing on the wrong ayah.
                                     // ۩ marks a sajda ayah, matching print convention.
                                     TextSpan(
-                                      text: ' ﴾${toEasternDigits(a.ayahNumber)}${a.isSajda ? '۩' : ''}﴿ ',
+                                      text: ' ﴿${toEasternDigits(a.ayahNumber)}${a.isSajda ? '۩' : ''}﴾ ',
                                       style: const TextStyle(
                                         color: Color(0xFFB08D57),
                                         fontSize: 13,
