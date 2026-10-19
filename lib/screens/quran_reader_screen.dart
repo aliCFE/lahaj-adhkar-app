@@ -15,6 +15,25 @@ const double _kMushafFontSize = 19;
 const double _kMushafLineHeight = 2.3;
 const double _kBasmalaFontSize = 20;
 
+/// The Quran text data embeds the Basmala as a literal prefix in every
+/// surah's ayah 1 (except At-Tawbah, which has none) — e.g. ayah 2:1 is
+/// "بسم الله الرحمن الرحيم الم". Mushaf Mode renders its own standalone
+/// Basmala line above the text, so that embedded copy is stripped out of
+/// the displayed ayah text to avoid showing it twice. The prefix is taken
+/// from Al-Fatiha's ayah 1 (which *is* exactly the Basmala) rather than
+/// retyped, so it is guaranteed to match the data's exact text byte for
+/// byte, diacritics included.
+String? _basmalaPrefixCache;
+String get _basmalaPrefix =>
+    _basmalaPrefixCache ??= QuranRepository.instance.ayahsForSurah(1).first.text;
+
+String _mushafAyahText(QuranAyah a) {
+  if (a.ayahNumber == 1 && a.surahNumber != 1 && a.text.startsWith(_basmalaPrefix)) {
+    return a.text.substring(_basmalaPrefix.length).trimLeft();
+  }
+  return a.text;
+}
+
 class QuranReaderScreen extends StatefulWidget {
   const QuranReaderScreen({super.key, required this.initialPage});
 
@@ -199,88 +218,108 @@ class _QuranPageView extends StatelessWidget {
       height: _kMushafLineHeight,
       color: const Color(0xFF2B2117),
     );
-    final isNewSurah = ayahs.isNotEmpty && ayahs.first.ayahNumber == 1;
-    final surah = isNewSurah ? QuranRepository.instance.surahByNumber(ayahs.first.surahNumber) : null;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFFFBF6E9),
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: const Color(0xFFC9A96A), width: 1.4),
-          boxShadow: const [
-            BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4)),
-          ],
-        ),
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
-                child: Directionality(
-                  textDirection: TextDirection.rtl,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (surah != null) ...[
-                        _SurahBanner(surah: surah),
-                        const SizedBox(height: 10),
-                        if (surah.number != 1 && surah.number != 9)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Text(
-                              'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.amiriQuran(fontSize: _kBasmalaFontSize, color: const Color(0xFF2B2117)),
-                            ),
-                          ),
-                      ],
-                      RichText(
-                        textAlign: TextAlign.justify,
-                        text: TextSpan(
-                          style: style,
-                          children: [
-                            for (final a in ayahs) ...[
-                              TextSpan(text: a.text),
-                              WidgetSpan(
-                                alignment: PlaceholderAlignment.middle,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                                  child: Container(
-                                    width: 24,
-                                    height: 24,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: const Color(0xFFB08D57), width: 1.2),
-                                      color: a.isSajda ? const Color(0x33B08D57) : null,
-                                    ),
-                                    child: Text(
-                                      toEasternDigits(a.ayahNumber),
-                                      style: const TextStyle(fontSize: 10.5, color: Color(0xFFB08D57)),
-                                    ),
+    // A page can contain several short surahs back to back (common near
+    // the end of the Mushaf), so the ayahs are split into per-surah runs —
+    // each run gets its own banner + Basmala when it starts a surah,
+    // instead of only the page's very first ayah.
+    final segments = <List<QuranAyah>>[];
+    for (final a in ayahs) {
+      if (segments.isEmpty || segments.last.first.surahNumber != a.surahNumber) {
+        segments.add([a]);
+      } else {
+        segments.last.add(a);
+      }
+    }
+
+    // On tablets/iPad the available area is much bigger than a printed
+    // Mushaf page, so the page card is capped to a book-like size and
+    // centered — like a real page on a table — instead of stretching to
+    // fill the screen. On phones these caps simply don't bind.
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 480, maxHeight: 760),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFFBF6E9),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: const Color(0xFFC9A96A), width: 1.4),
+              boxShadow: const [
+                BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4)),
+              ],
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
+                    child: Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Every segment but the first necessarily opens a
+                          // surah at its ayah 1 — a page only continues an
+                          // earlier surah at its very start.
+                          for (final segment in segments) ...[
+                            if (segment.first.ayahNumber == 1) ...[
+                              if (segment != segments.first) const SizedBox(height: 14),
+                              _SurahBanner(
+                                surah: QuranRepository.instance.surahByNumber(segment.first.surahNumber),
+                              ),
+                              const SizedBox(height: 10),
+                              if (segment.first.surahNumber != 1 && segment.first.surahNumber != 9)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: Text(
+                                    'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.amiriQuran(fontSize: _kBasmalaFontSize, color: const Color(0xFF2B2117)),
                                   ),
                                 ),
-                              ),
-                              const TextSpan(text: ' '),
                             ],
+                            RichText(
+                              textAlign: TextAlign.justify,
+                              text: TextSpan(
+                                style: style,
+                                children: [
+                                  for (final a in segment) ...[
+                                    TextSpan(text: _mushafAyahText(a)),
+                                    // A plain-text marker, not a WidgetSpan: Flutter
+                                    // can misplace WidgetSpans relative to their
+                                    // surrounding text in justified RTL paragraphs
+                                    // (flutter/flutter#111381), which showed up here
+                                    // as ayah-end circles landing on the wrong ayah.
+                                    // ۩ marks a sajda ayah, matching print convention.
+                                    TextSpan(
+                                      text: ' ﴿${toEasternDigits(a.ayahNumber)}${a.isSajda ? '۩' : ''}﴾ ',
+                                      style: const TextStyle(
+                                        color: Color(0xFFB08D57),
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
                           ],
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    toEasternDigits(page),
+                    style: const TextStyle(color: Color(0xFFB08D57), fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Text(
-                toEasternDigits(page),
-                style: const TextStyle(color: Color(0xFFB08D57), fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -305,21 +344,28 @@ class _QuranReadingModePage extends StatelessWidget {
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      child: Directionality(
-        textDirection: TextDirection.rtl,
-        child: RichText(
-          textAlign: TextAlign.justify,
-          text: TextSpan(
-            style: style,
-            children: [
-              for (final a in ayahs) ...[
-                TextSpan(text: a.text),
-                TextSpan(
-                  text: ' ﴿${toEasternDigits(a.ayahNumber)}﴾ ',
-                  style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16 * appState.textScale),
-                ),
-              ],
-            ],
+      child: Center(
+        child: ConstrainedBox(
+          // Caps the line length on tablets so justified Arabic text stays
+          // comfortable to read instead of stretching edge to edge.
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: RichText(
+              textAlign: TextAlign.justify,
+              text: TextSpan(
+                style: style,
+                children: [
+                  for (final a in ayahs) ...[
+                    TextSpan(text: a.text),
+                    TextSpan(
+                      text: ' ﴿${toEasternDigits(a.ayahNumber)}﴾ ',
+                      style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16 * appState.textScale),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
         ),
       ),
