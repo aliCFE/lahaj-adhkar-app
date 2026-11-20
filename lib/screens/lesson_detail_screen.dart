@@ -122,18 +122,11 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: Row(
                   children: [
-                    if (next != null)
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          icon: const Icon(Icons.arrow_back_rounded, size: 18),
-                          label: Text('التالي: ${next.title}', overflow: TextOverflow.ellipsis),
-                          onPressed: () => Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (_) => LessonDetailScreen(lesson: next, section: widget.section)),
-                          ),
-                        ),
-                      ),
-                    if (prev != null && next != null) const SizedBox(width: 8),
+                    // Row reverses child order under ambient RTL Directionality, so
+                    // "previous" is listed first to land on the physical right and
+                    // "next" second to land on the physical left (same convention as
+                    // the السابقة/التالية button rows in quran_reader_screen.dart and
+                    // reader_screen.dart).
                     if (prev != null)
                       Expanded(
                         child: OutlinedButton.icon(
@@ -142,6 +135,18 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                           onPressed: () => Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(builder: (_) => LessonDetailScreen(lesson: prev, section: widget.section)),
+                          ),
+                        ),
+                      ),
+                    if (prev != null && next != null) const SizedBox(width: 8),
+                    if (next != null)
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                          label: Text('التالي: ${next.title}', overflow: TextOverflow.ellipsis),
+                          onPressed: () => Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (_) => LessonDetailScreen(lesson: next, section: widget.section)),
                           ),
                         ),
                       ),
