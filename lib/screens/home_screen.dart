@@ -144,7 +144,7 @@ class HomeScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('أسماء الله الحسنى', style: TextStyle(color: Color(0xFFE8C27A), fontWeight: FontWeight.bold)),
-                          Text('٩٩ اسمًا، مع الشرح والمعنى', style: TextStyle(color: Color(0xFFB9BBD8), fontSize: 12)),
+                          Text('٩٩ اسمًا، مع المعنى وأثر الإيمان به', style: TextStyle(color: Color(0xFFB9BBD8), fontSize: 12)),
                         ],
                       ),
                     ),

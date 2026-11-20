@@ -78,6 +78,17 @@ class SettingsScreen extends StatelessWidget {
             'بدعم ورعاية حذيفة، وبرمجة وتطوير شركة Nova.',
             style: TextStyle(height: 1.6),
           ),
+          const SizedBox(height: 12),
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF14152E),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Image.asset('assets/icon/nova_logo_white.png', width: 160),
+            ),
+          ),
         ],
       ),
     );

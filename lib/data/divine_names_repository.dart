@@ -23,6 +23,7 @@ class DivineNamesRepository {
         name: map['name'] as String,
         translit: map['translit'] as String,
         meaning: map['meaning'] as String,
+        effect: map['effect'] as String,
       );
     }).toList();
   }

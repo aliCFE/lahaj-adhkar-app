@@ -42,7 +42,7 @@ class _DivineNamesScreenState extends State<DivineNamesScreen> {
           final q = _query.trim();
           final filtered = q.isEmpty
               ? all
-              : all.where((n) => n.name.contains(q) || n.meaning.contains(q) || n.translit.toLowerCase().contains(q.toLowerCase())).toList();
+              : all.where((n) => n.name.contains(q) || n.meaning.contains(q) || n.effect.contains(q) || n.translit.toLowerCase().contains(q.toLowerCase())).toList();
 
           return Column(
             children: [
@@ -187,17 +187,71 @@ class _NameDetailSheet extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Center(child: Text(entry.translit, style: const TextStyle(color: _kAccent, fontSize: 14, letterSpacing: 1))),
-            const SizedBox(height: 18),
-            Text('المعنى', style: TextStyle(color: _kGold, fontWeight: FontWeight.bold, fontSize: 13)),
-            const SizedBox(height: 8),
-            Text(
-              entry.meaning,
-              textDirection: TextDirection.rtl,
-              textAlign: TextAlign.right,
-              style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.7),
+            const SizedBox(height: 24),
+            _DetailSection(
+              icon: Icons.menu_book_rounded,
+              iconColor: _kGold,
+              title: 'المعنى',
+              text: entry.meaning,
+            ),
+            const SizedBox(height: 16),
+            _DetailSection(
+              icon: Icons.favorite_rounded,
+              iconColor: _kAccent,
+              title: 'أثر الإيمان بهذا الاسم',
+              text: entry.effect,
+              highlight: true,
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _DetailSection extends StatelessWidget {
+  const _DetailSection({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.text,
+    this.highlight = false,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String text;
+  final bool highlight;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: highlight ? iconColor.withValues(alpha: 0.08) : Colors.white.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: iconColor.withValues(alpha: 0.25)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: iconColor, size: 18),
+              const SizedBox(width: 8),
+              Text(title, style: TextStyle(color: iconColor, fontWeight: FontWeight.bold, fontSize: 13)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            text,
+            textDirection: TextDirection.rtl,
+            textAlign: TextAlign.right,
+            style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.8),
+          ),
+        ],
       ),
     );
   }
