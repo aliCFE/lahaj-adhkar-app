@@ -24,7 +24,7 @@ class AppState extends ChangeNotifier {
   final Map<String, int> _progress = {};
   double _textScale = 1.0;
   bool _haptics = true;
-  bool _darkMode = false;
+  bool _darkMode = true;
   int? _quranLastPage;
   Set<int> _quranBookmarks = {};
 
@@ -43,7 +43,7 @@ class AppState extends ChangeNotifier {
     state._recent = prefs.getStringList(_kRecent) ?? [];
     state._textScale = prefs.getDouble(_kTextScale) ?? 1.0;
     state._haptics = prefs.getBool(_kHaptics) ?? true;
-    state._darkMode = prefs.getBool(_kDarkMode) ?? false;
+    state._darkMode = prefs.getBool(_kDarkMode) ?? true;
     state._quranLastPage = prefs.getInt(_kQuranLastPage);
     state._quranBookmarks =
         (prefs.getStringList(_kQuranBookmarks) ?? []).map(int.parse).toSet();

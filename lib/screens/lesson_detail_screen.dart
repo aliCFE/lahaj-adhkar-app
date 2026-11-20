@@ -237,7 +237,8 @@ class _LessonBlockView extends StatelessWidget {
             ),
           ),
         WarningCard() => _Card(
-            color: const Color(0xFFFBE3D0),
+            color: Theme.of(context).colorScheme.tertiaryContainer,
+            textColor: Theme.of(context).colorScheme.onTertiaryContainer,
             icon: Icons.info_rounded,
             label: 'تنبيه',
             child: Text(b.text, textDirection: TextDirection.rtl, textAlign: TextAlign.right, style: TextStyle(fontSize: 14 * textScale, height: 1.7)),
@@ -268,15 +269,17 @@ class _LessonBlockView extends StatelessWidget {
 }
 
 class _Card extends StatelessWidget {
-  const _Card({required this.color, required this.icon, required this.label, required this.child, this.trailing});
+  const _Card({required this.color, required this.icon, required this.label, required this.child, this.trailing, this.textColor});
   final Color color;
   final IconData icon;
   final String label;
   final Widget child;
   final Widget? trailing;
+  final Color? textColor;
 
   @override
   Widget build(BuildContext context) {
+    final labelColor = textColor ?? Colors.black54;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
@@ -286,14 +289,14 @@ class _Card extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 16, color: Colors.black54),
+              Icon(icon, size: 16, color: labelColor),
               const SizedBox(width: 6),
-              Expanded(child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black54))),
+              Expanded(child: Text(label, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: labelColor))),
               ?trailing,
             ],
           ),
           const SizedBox(height: 8),
-          child,
+          textColor != null ? DefaultTextStyle.merge(style: TextStyle(color: textColor), child: child) : child,
         ],
       ),
     );
