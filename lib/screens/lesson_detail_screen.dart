@@ -130,7 +130,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                     if (prev != null)
                       Expanded(
                         child: OutlinedButton.icon(
-                          icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                          icon: const Icon(Icons.arrow_back_rounded, size: 18),
                           label: Text('السابق: ${prev.title}', overflow: TextOverflow.ellipsis),
                           onPressed: () => Navigator.pushReplacement(
                             context,
@@ -142,7 +142,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                     if (next != null)
                       Expanded(
                         child: OutlinedButton.icon(
-                          icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                          icon: const Icon(Icons.arrow_forward_rounded, size: 18),
                           label: Text('التالي: ${next.title}', overflow: TextOverflow.ellipsis),
                           onPressed: () => Navigator.pushReplacement(
                             context,
