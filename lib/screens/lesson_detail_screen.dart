@@ -104,10 +104,9 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                 return ActionChip(
                   label: Text(related.title),
                   onPressed: () {
-                    final relatedSection = related.sectionId == hajjSection.id ? hajjSection : umrahSection;
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (_) => LessonDetailScreen(lesson: related, section: relatedSection)),
+                      MaterialPageRoute(builder: (_) => LessonDetailScreen(lesson: related, section: sectionFor(related))),
                     );
                   },
                 );

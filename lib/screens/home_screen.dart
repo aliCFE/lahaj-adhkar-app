@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../data/fiqh_content.dart';
-import '../data/hajj_fasting_content.dart';
+import '../data/lesson_sections.dart';
 import '../models/dhikr_item.dart';
 import '../theme/icon_map.dart';
 import 'all_adhkar_screen.dart';
 import 'divine_names_screen.dart';
 import 'group_screen.dart';
-import 'guide_article_screen.dart';
 import 'hajj_umrah_home_screen.dart';
+import 'lesson_list_screen.dart';
 import 'quran_index_screen.dart';
 import 'reader_screen.dart';
 import 'settings_screen.dart';
@@ -108,134 +107,81 @@ class HomeScreen extends StatelessWidget {
             }).toList(),
           ),
           const SizedBox(height: 20),
-          Card(
-            elevation: 0,
-            color: Theme.of(context).colorScheme.secondaryContainer,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              leading: const Icon(Icons.menu_book_rounded),
-              title: const Text('القرآن الكريم'),
-              subtitle: const Text('604 صفحة، مع البحث والفهرسة بالسور والأجزاء'),
-              trailing: const Icon(Icons.arrow_back_ios_new, size: 16),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const QuranIndexScreen()),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Material(
-            color: const Color(0xFF181B3A),
-            borderRadius: BorderRadius.circular(16),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const DivineNamesScreen()),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Row(
-                  children: [
-                    Icon(Icons.auto_awesome_rounded, color: Color(0xFFE8C27A)),
-                    SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('أسماء الله الحسنى', style: TextStyle(color: Color(0xFFE8C27A), fontWeight: FontWeight.bold)),
-                          Text('٩٩ اسمًا، مع المعنى وأثر الإيمان به', style: TextStyle(color: Color(0xFFB9BBD8), fontSize: 12)),
-                        ],
-                      ),
-                    ),
-                    Icon(Icons.arrow_back_ios_new, size: 16, color: Color(0xFFE8C27A)),
-                  ],
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 1,
+            children: [
+              _BigSectionCard(
+                icon: Icons.menu_book_rounded,
+                title: 'القرآن الكريم',
+                subtitle: '604 صفحة، مع البحث والفهرسة',
+                background: Theme.of(context).colorScheme.secondaryContainer,
+                foreground: Theme.of(context).colorScheme.onSecondaryContainer,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const QuranIndexScreen()),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Card(
-            elevation: 0,
-            color: Theme.of(context).colorScheme.primaryContainer,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              leading: const Icon(Icons.explore_rounded),
-              title: const Text('ماذا تفعل الآن؟'),
-              subtitle: const Text('أخبرنا بموقفك، ونعرض لك الذكر المناسب فورًا'),
-              trailing: const Icon(Icons.arrow_back_ios_new, size: 16),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => SituationScreen(groups: groups)),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Material(
-            color: const Color(0xFF1B3324),
-            borderRadius: BorderRadius.circular(16),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const HajjUmrahHomeScreen()),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Row(
-                  children: [
-                    Icon(Icons.mosque_rounded, color: Color(0xFFD9B266)),
-                    SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('الحج والعمرة', style: TextStyle(color: Color(0xFFD9B266), fontWeight: FontWeight.bold)),
-                          Text('دليل تعليمي كامل: ١٣ درسًا بالتسلسل، مع مكتبة الأدعية', style: TextStyle(color: Color(0xFFCBD6CE), fontSize: 12)),
-                        ],
-                      ),
-                    ),
-                    Icon(Icons.arrow_back_ios_new, size: 16, color: Color(0xFFD9B266)),
-                  ],
+              _BigSectionCard(
+                icon: Icons.auto_awesome_rounded,
+                title: 'أسماء الله الحسنى',
+                subtitle: '٩٩ اسمًا، مع المعنى وأثره',
+                background: const Color(0xFF181B3A),
+                foreground: const Color(0xFFE8C27A),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const DivineNamesScreen()),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Card(
-            elevation: 0,
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              leading: const Icon(Icons.nightlight_round),
-              title: const Text('الصيام'),
-              subtitle: const Text('دليل مبسّط بأحكامه وأركانه وشروطه'),
-              trailing: const Icon(Icons.arrow_back_ios_new, size: 16),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => GuideArticleScreen(article: hajjFastingArticles.first)),
+              _BigSectionCard(
+                icon: Icons.explore_rounded,
+                title: 'ماذا تفعل الآن؟',
+                subtitle: 'نعرض لك الذكر المناسب لموقفك',
+                background: Theme.of(context).colorScheme.primaryContainer,
+                foreground: Theme.of(context).colorScheme.onPrimaryContainer,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => SituationScreen(groups: groups)),
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Card(
-            elevation: 0,
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              leading: const Icon(Icons.menu_book_outlined),
-              title: const Text('الفقه باختصار'),
-              subtitle: const Text('خريطة سريعة لعلم الفقه ومذاهبه وأبوابه'),
-              trailing: const Icon(Icons.arrow_back_ios_new, size: 16),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => GuideArticleScreen(article: fiqhOverview)),
+              _BigSectionCard(
+                icon: Icons.mosque_rounded,
+                title: 'الحج والعمرة',
+                subtitle: '١٣ درسًا بالتسلسل، مع مكتبة الأدعية',
+                background: const Color(0xFF1B3324),
+                foreground: const Color(0xFFD9B266),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HajjUmrahHomeScreen()),
+                ),
               ),
-            ),
+              _BigSectionCard(
+                icon: Icons.nightlight_round,
+                title: 'الصيام',
+                subtitle: 'أحكامه وأركانه وشروطه',
+                background: const Color(0xFF16213B),
+                foreground: const Color(0xFF9FB8D9),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => LessonListScreen(section: fastingSection)),
+                ),
+              ),
+              _BigSectionCard(
+                icon: Icons.gavel_rounded,
+                title: 'الفقه الإسلامي',
+                subtitle: 'مدخل إلى الفقه ومذاهبه وأبوابه',
+                background: const Color(0xFF2B1F14),
+                foreground: const Color(0xFFD2A857),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => LessonListScreen(section: fiqhSection)),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
           Text('أذكار حسب الموقف', style: Theme.of(context).textTheme.headlineSmall),
@@ -292,6 +238,73 @@ class _ShortcutCard extends StatelessWidget {
               Text(label, style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BigSectionCard extends StatelessWidget {
+  const _BigSectionCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.background,
+    required this.foreground,
+    this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color background;
+  final Color foreground;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: background,
+      borderRadius: BorderRadius.circular(20),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Stack(
+          children: [
+            Positioned(
+              left: -24,
+              bottom: -24,
+              child: Icon(icon, size: 130, color: foreground.withValues(alpha: 0.15)),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(icon, size: 22, color: foreground),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        textAlign: TextAlign.right,
+                        style: TextStyle(color: foreground, fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        textAlign: TextAlign.right,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: foreground.withValues(alpha: 0.78), fontSize: 11, height: 1.4),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

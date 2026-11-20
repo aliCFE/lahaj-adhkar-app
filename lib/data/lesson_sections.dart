@@ -1,8 +1,12 @@
 import '../models/lesson.dart';
+import 'fasting_lessons.dart';
+import 'fiqh_lessons.dart';
 import 'hajj_umrah_lessons.dart';
 
+final List<Lesson> _allLessons = [...hajjUmrahLessons, ...fastingLessons, ...fiqhLessons];
+
 List<Lesson> _forSection(String sectionId) {
-  final list = hajjUmrahLessons.where((l) => l.sectionId == sectionId).toList();
+  final list = _allLessons.where((l) => l.sectionId == sectionId).toList();
   list.sort((a, b) => a.order.compareTo(b.order));
   return list;
 }
@@ -25,8 +29,39 @@ final LessonSection umrahSection = LessonSection(
 
 final List<LessonSection> hajjUmrahSections = [hajjSection, umrahSection];
 
+final LessonSection fastingSection = LessonSection(
+  id: 'fasting',
+  title: 'الصيام',
+  subtitle: 'من أساسياته وكيفيته إلى أعذاره وأنواعه وزكاة الفطر',
+  icon: 'moon',
+  lessons: _forSection('fasting'),
+);
+
+final LessonSection fiqhSection = LessonSection(
+  id: 'fiqh',
+  title: 'الفقه الإسلامي',
+  subtitle: 'مدخل إلى الفقه، أحكامه، مصادره، مذاهبه، وأبوابه',
+  icon: 'gavel',
+  lessons: _forSection('fiqh'),
+);
+
+LessonSection sectionFor(Lesson lesson) {
+  switch (lesson.sectionId) {
+    case 'hajj':
+      return hajjSection;
+    case 'umrah':
+      return umrahSection;
+    case 'fasting':
+      return fastingSection;
+    case 'fiqh':
+      return fiqhSection;
+    default:
+      return hajjSection;
+  }
+}
+
 Lesson? lessonById(String id) {
-  for (final l in hajjUmrahLessons) {
+  for (final l in _allLessons) {
     if (l.id == id) return l;
   }
   return null;

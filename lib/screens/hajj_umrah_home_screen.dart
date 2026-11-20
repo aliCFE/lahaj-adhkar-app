@@ -23,7 +23,7 @@ class HajjUmrahHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     final lastLessonId = appState.recent.firstWhere(
-      (id) => id.startsWith('lesson:') && lessonById(id.substring(7)) != null,
+      (id) => id.startsWith('lesson:') && (lessonById(id.substring(7))?.sectionId == 'hajj' || lessonById(id.substring(7))?.sectionId == 'umrah'),
       orElse: () => '',
     );
     final lastLesson = lastLessonId.isEmpty ? null : lessonById(lastLessonId.substring(7));
@@ -74,10 +74,7 @@ class HajjUmrahHomeScreen extends StatelessWidget {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => LessonDetailScreen(
-                      lesson: lastLesson,
-                      section: lastLesson.sectionId == hajjSection.id ? hajjSection : umrahSection,
-                    ),
+                    builder: (_) => LessonDetailScreen(lesson: lastLesson, section: sectionFor(lastLesson)),
                   ),
                 ),
                 child: Padding(

@@ -40,6 +40,8 @@ IconData iconForName(String name) {
       return Icons.nightlight_round;
     case 'book':
       return Icons.menu_book_rounded;
+    case 'gavel':
+      return Icons.gavel_rounded;
     default:
       return Icons.menu_book_rounded;
   }
