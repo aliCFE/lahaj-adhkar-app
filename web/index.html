@@ -31,16 +31,32 @@
 
   <title>sakeenah</title>
   <link rel="manifest" href="manifest.json">
+  <script src="flutter.js" defer></script>
 </head>
 <body>
   <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
+    Manual initialization (instead of the auto-generated flutter_bootstrap.js)
+    so canvasKitBaseUrl can point at the CanvasKit files bundled in this build
+    instead of the default gstatic.com CDN — some networks/devices (reported:
+    real iOS Safari, blank white page, worked fine in a desktop browser) can't
+    reach that CDN, which otherwise leaves the engine stuck with nothing to
+    render and no visible error.
 
     For more details:
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
-  <script src="flutter_bootstrap.js" async></script>
+  <script>
+    window.addEventListener('load', function (ev) {
+      _flutter.loader.loadEntrypoint({
+        onEntrypointLoaded: async function (engineInitializer) {
+          const appRunner = await engineInitializer.initializeEngine({
+            renderer: "canvaskit",
+            canvasKitBaseUrl: "canvaskit/",
+          });
+          appRunner.runApp();
+        },
+      });
+    });
+  </script>
 </body>
 </html>
