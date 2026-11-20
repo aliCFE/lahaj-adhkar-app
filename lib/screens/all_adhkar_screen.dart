@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../data/content_repository.dart';
 import '../models/dhikr_item.dart';
 import '../state/app_state.dart';
+import '../widgets/dark_mode_toggle.dart';
 import 'reader_screen.dart';
 
 enum _Filter { all, favorites, recent }
@@ -59,7 +60,7 @@ class _AllAdhkarScreenState extends State<AllAdhkarScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('كل الأذكار')),
+      appBar: AppBar(title: const Text('كل الأذكار'), actions: const [DarkModeToggle()]),
       body: Column(
         children: [
           Padding(

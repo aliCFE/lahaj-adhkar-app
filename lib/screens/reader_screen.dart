@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/dhikr_item.dart';
 import '../state/app_state.dart';
+import '../widgets/dark_mode_toggle.dart';
 import '../widgets/dhikr_card.dart';
 
 class ReaderScreen extends StatefulWidget {
@@ -34,7 +35,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
     final items = widget.items;
     if (items.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: Text(widget.title)),
+        appBar: AppBar(title: Text(widget.title), actions: const [DarkModeToggle()]),
         body: const Center(child: Text('لا توجد أذكار في هذا القسم حاليًا')),
       );
     }
@@ -42,6 +43,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: const [DarkModeToggle()],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(6),
           child: LinearProgressIndicator(

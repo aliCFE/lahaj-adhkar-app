@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../data/quran_repository.dart';
 import '../theme/arabic_digits.dart';
+import '../widgets/dark_mode_toggle.dart';
 import 'quran_reader_screen.dart';
 
 const _kMushafGold = Color(0xFFC9A96A);
@@ -31,6 +32,7 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
         backgroundColor: _kMushafInk,
         foregroundColor: _kMushafGold,
         title: const Text('البحث في القرآن الكريم'),
+        actions: const [DarkModeToggle()],
       ),
       body: Column(
         children: [

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../data/lesson_sections.dart';
 import '../models/dhikr_item.dart';
 import '../theme/icon_map.dart';
+import '../widgets/dark_mode_toggle.dart';
 import 'all_adhkar_screen.dart';
 import 'divine_names_screen.dart';
 import 'group_screen.dart';
@@ -57,6 +58,7 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
         actions: [
+          const DarkModeToggle(),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => Navigator.push(

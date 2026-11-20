@@ -5,6 +5,7 @@ import '../data/quran_repository.dart';
 import '../models/quran.dart';
 import '../state/app_state.dart';
 import '../theme/arabic_digits.dart';
+import '../widgets/dark_mode_toggle.dart';
 import 'quran_reader_screen.dart';
 import 'quran_search_screen.dart';
 
@@ -39,6 +40,7 @@ class _QuranIndexScreenState extends State<QuranIndexScreen> with SingleTickerPr
             icon: const Icon(Icons.search),
             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuranSearchScreen())),
           ),
+          const DarkModeToggle(),
         ],
         bottom: TabBar(
           controller: _tabController,

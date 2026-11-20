@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../data/divine_names_repository.dart';
 import '../models/divine_name.dart';
 import '../theme/arabic_digits.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 const _kBg = Color(0xFF0E1026);
 const _kCard = Color(0xFF181B3A);
@@ -31,6 +32,7 @@ class _DivineNamesScreenState extends State<DivineNamesScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
         title: const Text('أسماء الله الحسنى'),
+        actions: const [DarkModeToggle()],
       ),
       body: FutureBuilder<void>(
         future: _loadFuture,

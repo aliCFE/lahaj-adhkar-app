@@ -6,6 +6,7 @@ import '../data/quran_repository.dart';
 import '../models/quran.dart';
 import '../state/app_state.dart';
 import '../theme/arabic_digits.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 /// Mushaf Mode uses a fixed type size, independent of device size or the
 /// app-wide text-size slider — matching how a printed Mushaf has one fixed
@@ -110,6 +111,7 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
             ),
             onPressed: () => appState.toggleQuranBookmark(_page),
           ),
+          const DarkModeToggle(),
         ],
       ),
       backgroundColor: _readingMode ? null : const Color(0xFFEDE6D6),

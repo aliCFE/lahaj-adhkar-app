@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/dhikr_item.dart';
 import '../state/app_state.dart';
+import '../widgets/dark_mode_toggle.dart';
 import 'content_review_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -15,7 +16,7 @@ class SettingsScreen extends StatelessWidget {
     final appState = context.watch<AppState>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('الإعدادات')),
+      appBar: AppBar(title: const Text('الإعدادات'), actions: const [DarkModeToggle()]),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

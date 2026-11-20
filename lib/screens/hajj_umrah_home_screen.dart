@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../data/lesson_sections.dart';
 import '../models/lesson.dart';
 import '../state/app_state.dart';
+import '../widgets/dark_mode_toggle.dart';
 import 'hajj_umrah_duas_screen.dart';
 import 'lesson_detail_screen.dart';
 import 'lesson_list_screen.dart';
@@ -35,6 +36,7 @@ class HajjUmrahHomeScreen extends StatelessWidget {
         foregroundColor: Colors.white,
         elevation: 0,
         title: const Text('الحج والعمرة'),
+        actions: const [DarkModeToggle()],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),

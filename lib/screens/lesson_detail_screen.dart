@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../data/lesson_sections.dart';
 import '../models/lesson.dart';
 import '../state/app_state.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 /// Renders a single [Lesson]'s blocks with per-type styling (headings,
 /// bullet lists, ruling/quote/warning/du'a cards, comparison tables),
@@ -67,6 +68,7 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
             icon: Icon(appState.isFavorite(favId) ? Icons.bookmark_rounded : Icons.bookmark_border_rounded),
             onPressed: () => appState.toggleFavorite(favId),
           ),
+          const DarkModeToggle(),
         ],
       ),
       body: ListView(
@@ -141,12 +143,21 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                     if (prev != null && next != null) const SizedBox(width: 8),
                     if (next != null)
                       Expanded(
-                        child: OutlinedButton.icon(
-                          icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                          label: Text('التالي: ${next.title}', overflow: TextOverflow.ellipsis),
+                        child: OutlinedButton(
                           onPressed: () => Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(builder: (_) => LessonDetailScreen(lesson: next, section: widget.section)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: Text('التالي: ${next.title}', overflow: TextOverflow.ellipsis),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward_rounded, size: 18),
+                            ],
                           ),
                         ),
                       ),

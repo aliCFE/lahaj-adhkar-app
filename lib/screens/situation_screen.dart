@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/dhikr_item.dart';
+import '../widgets/dark_mode_toggle.dart';
 import 'all_adhkar_screen.dart';
 import 'reader_screen.dart';
 
@@ -55,7 +56,7 @@ class SituationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('ماذا تفعل الآن؟')),
+      appBar: AppBar(title: const Text('ماذا تفعل الآن؟'), actions: const [DarkModeToggle()]),
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: _situations.length + 1,

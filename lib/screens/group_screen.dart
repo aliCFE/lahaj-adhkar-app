@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/dhikr_item.dart';
 import '../state/app_state.dart';
+import '../widgets/dark_mode_toggle.dart';
 import 'reader_screen.dart';
 
 class GroupScreen extends StatelessWidget {
@@ -15,7 +16,7 @@ class GroupScreen extends StatelessWidget {
     final appState = context.watch<AppState>();
 
     return Scaffold(
-      appBar: AppBar(title: Text(group.name)),
+      appBar: AppBar(title: Text(group.name), actions: const [DarkModeToggle()]),
       body: group.subcategories.isEmpty
           ? const Center(child: Text('المحتوى قيد الإعداد — قريبًا بإذن الله'))
           : ListView.separated(

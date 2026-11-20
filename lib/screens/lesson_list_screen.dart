@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/lesson.dart';
 import '../state/app_state.dart';
+import '../widgets/dark_mode_toggle.dart';
 import 'lesson_detail_screen.dart';
 
 /// Lists a [LessonSection]'s lessons in order, each with a read checkmark
@@ -21,7 +22,7 @@ class LessonListScreen extends StatelessWidget {
     final progress = total == 0 ? 0.0 : readCount / total;
 
     return Scaffold(
-      appBar: AppBar(title: Text(section.title)),
+      appBar: AppBar(title: Text(section.title), actions: const [DarkModeToggle()]),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

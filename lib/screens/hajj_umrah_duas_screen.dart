@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../data/hajj_umrah_lessons.dart';
 import '../models/lesson.dart';
+import '../widgets/dark_mode_toggle.dart';
 
 /// A standalone library of Hajj & Umrah du'as, outside the lesson flow,
 /// each with a copy button and its source/occasion noted.
@@ -12,7 +13,7 @@ class HajjUmrahDuasScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('أدعية الحج والعمرة')),
+      appBar: AppBar(title: const Text('أدعية الحج والعمرة'), actions: const [DarkModeToggle()]),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [for (final dua in hajjUmrahDuas) _DuaTile(dua: dua)],
