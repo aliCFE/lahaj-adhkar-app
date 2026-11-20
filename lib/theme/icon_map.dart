@@ -32,6 +32,14 @@ IconData iconForName(String name) {
       return Icons.nights_stay_rounded;
     case 'terrain':
       return Icons.terrain_rounded;
+    case 'kaaba':
+      return Icons.mosque_rounded;
+    case 'umrah':
+      return Icons.directions_walk_rounded;
+    case 'moon':
+      return Icons.nightlight_round;
+    case 'book':
+      return Icons.menu_book_rounded;
     default:
       return Icons.menu_book_rounded;
   }

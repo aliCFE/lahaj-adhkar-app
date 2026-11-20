@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../data/fiqh_content.dart';
+import '../data/hajj_fasting_content.dart';
 import '../models/dhikr_item.dart';
 import '../theme/icon_map.dart';
 import 'all_adhkar_screen.dart';
 import 'divine_names_screen.dart';
 import 'group_screen.dart';
 import 'guide_article_screen.dart';
-import 'hajj_fasting_screen.dart';
+import 'hajj_umrah_home_screen.dart';
 import 'quran_index_screen.dart';
 import 'reader_screen.dart';
 import 'settings_screen.dart';
@@ -172,19 +173,50 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
+          Material(
+            color: const Color(0xFF1B3324),
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const HajjUmrahHomeScreen()),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    Icon(Icons.mosque_rounded, color: Color(0xFFD9B266)),
+                    SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('الحج والعمرة', style: TextStyle(color: Color(0xFFD9B266), fontWeight: FontWeight.bold)),
+                          Text('دليل تعليمي كامل: ١٣ درسًا بالتسلسل، مع مكتبة الأدعية', style: TextStyle(color: Color(0xFFCBD6CE), fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.arrow_back_ios_new, size: 16, color: Color(0xFFD9B266)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
           Card(
             elevation: 0,
             color: Theme.of(context).colorScheme.surfaceContainerHighest,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              leading: const Icon(Icons.mosque_rounded),
-              title: const Text('الحج والصيام'),
-              subtitle: const Text('دليل مبسّط بأركانهما وشروطهما وخطواتهما'),
+              leading: const Icon(Icons.nightlight_round),
+              title: const Text('الصيام'),
+              subtitle: const Text('دليل مبسّط بأحكامه وأركانه وشروطه'),
               trailing: const Icon(Icons.arrow_back_ios_new, size: 16),
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const HajjFastingScreen()),
+                MaterialPageRoute(builder: (_) => GuideArticleScreen(article: hajjFastingArticles.first)),
               ),
             ),
           ),
