@@ -42,6 +42,10 @@ IconData iconForName(String name) {
       return Icons.menu_book_rounded;
     case 'gavel':
       return Icons.gavel_rounded;
+    case 'work':
+      return Icons.work_rounded;
+    case 'school':
+      return Icons.school_rounded;
     default:
       return Icons.menu_book_rounded;
   }

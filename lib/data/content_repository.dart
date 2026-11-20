@@ -25,8 +25,8 @@ const List<String> kAvailableGroupFiles = [
 /// Shown in the UI as "قريبًا" (coming soon) rather than hidden entirely,
 /// so the taxonomy is visibly complete without ever faking content.
 const List<DhikrGroup> kFutureGroups = [
-  DhikrGroup(id: 'ramadan', name: 'رمضان والصيام', icon: 'nights_stay', subcategories: []),
-  DhikrGroup(id: 'hajj', name: 'الحج والعمرة', icon: 'terrain', subcategories: []),
+  DhikrGroup(id: 'work', name: 'العمل والرزق', icon: 'work', subcategories: []),
+  DhikrGroup(id: 'exams', name: 'الامتحانات والدراسة', icon: 'school', subcategories: []),
 ];
 
 class ContentRepository {

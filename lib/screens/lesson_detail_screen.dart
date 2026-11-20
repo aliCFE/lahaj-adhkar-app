@@ -184,14 +184,11 @@ class _LessonBlockView extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: b.numbered
-                            ? Text('${i + 1}.', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary, fontSize: 14 * textScale))
-                            : Icon(Icons.circle, size: 6, color: Theme.of(context).colorScheme.primary),
-                      ),
+                      b.numbered
+                          ? Text('${i + 1}.', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary, fontSize: 14 * textScale))
+                          : Icon(Icons.circle, size: 6, color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -287,6 +284,10 @@ class _Card extends StatelessWidget {
   }
 }
 
+/// Renders each row as its own full-width card (label, then each other
+/// column as a small heading + value) instead of a rigid [DataTable] grid,
+/// since long Arabic sentences wrapped into narrow table cells become
+/// cramped and hard to read.
 class _ComparisonTableView extends StatelessWidget {
   const _ComparisonTableView({required this.table, required this.textScale});
   final ComparisonTable table;
@@ -294,27 +295,46 @@ class _ComparisonTableView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        headingRowColor: WidgetStateProperty.all(Theme.of(context).colorScheme.primaryContainer),
-        columns: [
-          for (final h in table.headers)
-            DataColumn(label: Text(h, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13 * textScale))),
-        ],
-        rows: [
-          for (final row in table.rows)
-            DataRow(cells: [
-              for (final cell in row)
-                DataCell(
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 220),
-                    child: Text(cell, textDirection: TextDirection.rtl, softWrap: true, style: TextStyle(fontSize: 13 * textScale, height: 1.5)),
-                  ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final row in table.rows)
+          Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  row[0],
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.right,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15 * textScale, color: Theme.of(context).colorScheme.primary),
                 ),
-            ]),
-        ],
-      ),
+                for (var i = 1; i < row.length; i++) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    table.headers[i],
+                    textDirection: TextDirection.rtl,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(fontSize: 11 * textScale, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.outline),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    row[i],
+                    textDirection: TextDirection.rtl,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(fontSize: 14 * textScale, height: 1.6),
+                  ),
+                ],
+              ],
+            ),
+          ),
+      ],
     );
   }
 }
