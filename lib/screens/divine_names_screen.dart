@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../data/divine_names_repository.dart';
-import '../data/quran_repository.dart';
 import '../models/divine_name.dart';
 import '../theme/arabic_digits.dart';
-import 'quran_reader_screen.dart';
 
 const _kBg = Color(0xFF0E1026);
 const _kCard = Color(0xFF181B3A);
@@ -21,10 +19,7 @@ class DivineNamesScreen extends StatefulWidget {
 }
 
 class _DivineNamesScreenState extends State<DivineNamesScreen> {
-  late final Future<void> _loadFuture = Future.wait([
-    DivineNamesRepository.instance.load(),
-    QuranRepository.instance.load(),
-  ]);
+  late final Future<void> _loadFuture = DivineNamesRepository.instance.load();
   String _query = '';
 
   @override
@@ -137,20 +132,6 @@ class _NameCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(entry.translit, style: const TextStyle(color: _kTextDim, fontSize: 11)),
-              if (entry.verses.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: _kGold.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${toEasternDigits(entry.verses.length)} آية',
-                    style: const TextStyle(color: _kGold, fontSize: 10),
-                  ),
-                ),
-              ],
             ],
           ),
         ),
@@ -215,47 +196,6 @@ class _NameDetailSheet extends StatelessWidget {
               textAlign: TextAlign.right,
               style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.7),
             ),
-            const SizedBox(height: 24),
-            Text(
-              entry.verses.isEmpty ? 'الورود في القرآن' : 'ورد هذا الاسم في ${toEasternDigits(entry.verses.length)} آية',
-              style: const TextStyle(color: _kGold, fontWeight: FontWeight.bold, fontSize: 13),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              entry.verses.isEmpty
-                  ? 'لم يرد هذا الاسم بهذه الصيغة نفسها في القرآن الكريم، وإنما ثبت من خلال السنة أو من معانٍ مشتقة من أفعال قرآنية بنفس الجذر.'
-                  : 'القائمة تضم كل موضع ورد فيه لفظ الاسم آليًا من نص القرآن، وبعض الألفاظ العامة (كـ"الملك" أو "الحق") قد ترد أحيانًا بمعناها اللغوي العام لا بصيغة التسمية الصريحة لله تعالى.',
-              textDirection: TextDirection.rtl,
-              textAlign: TextAlign.right,
-              style: const TextStyle(color: _kTextDim, fontSize: 12, height: 1.6),
-            ),
-            const SizedBox(height: 8),
-            if (entry.verses.isNotEmpty)
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: entry.verses.map((v) {
-                  return InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => QuranReaderScreen(initialPage: v.page)));
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: _kCard,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white12),
-                      ),
-                      child: Text(
-                        '${QuranRepository.instance.surahByNumber(v.surah).name} : ${toEasternDigits(v.ayah)}',
-                        style: const TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
           ],
         ),
       ),

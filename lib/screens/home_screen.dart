@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../data/fiqh_content.dart';
 import '../models/dhikr_item.dart';
 import '../theme/icon_map.dart';
 import 'all_adhkar_screen.dart';
 import 'divine_names_screen.dart';
 import 'group_screen.dart';
+import 'guide_article_screen.dart';
+import 'hajj_fasting_screen.dart';
 import 'quran_index_screen.dart';
 import 'reader_screen.dart';
 import 'settings_screen.dart';
@@ -141,7 +144,7 @@ class HomeScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('أسماء الله الحسنى', style: TextStyle(color: Color(0xFFE8C27A), fontWeight: FontWeight.bold)),
-                          Text('٩٩ اسمًا، مع الشرح ومواضع ورودها في القرآن', style: TextStyle(color: Color(0xFFB9BBD8), fontSize: 12)),
+                          Text('٩٩ اسمًا، مع الشرح والمعنى', style: TextStyle(color: Color(0xFFB9BBD8), fontSize: 12)),
                         ],
                       ),
                     ),
@@ -165,6 +168,40 @@ class HomeScreen extends StatelessWidget {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => SituationScreen(groups: groups)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            elevation: 0,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              leading: const Icon(Icons.mosque_rounded),
+              title: const Text('الحج والصيام'),
+              subtitle: const Text('دليل مبسّط بأركانهما وشروطهما وخطواتهما'),
+              trailing: const Icon(Icons.arrow_back_ios_new, size: 16),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const HajjFastingScreen()),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            elevation: 0,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              leading: const Icon(Icons.menu_book_outlined),
+              title: const Text('الفقه باختصار'),
+              subtitle: const Text('خريطة سريعة لعلم الفقه ومذاهبه وأبوابه'),
+              trailing: const Icon(Icons.arrow_back_ios_new, size: 16),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => GuideArticleScreen(article: fiqhOverview)),
               ),
             ),
           ),

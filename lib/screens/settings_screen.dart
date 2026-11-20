@@ -71,6 +71,13 @@ class SettingsScreen extends StatelessWidget {
               MaterialPageRoute(builder: (_) => ContentReviewScreen(groups: groups)),
             ),
           ),
+          const Divider(height: 32),
+          Text('شكر وتقدير', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          const Text(
+            'بدعم ورعاية حذيفة، وبرمجة وتطوير شركة Nova.',
+            style: TextStyle(height: 1.6),
+          ),
         ],
       ),
     );
