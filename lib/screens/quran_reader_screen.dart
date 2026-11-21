@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -198,22 +199,28 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
   }
 
   Future<void> _showPageJumpDialog() async {
-    final controller = TextEditingController();
+    var selected = _page;
     final target = await showDialog<int>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('الانتقال إلى صفحة'),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          textAlign: TextAlign.center,
-          decoration: const InputDecoration(hintText: '1 - 604'),
-          autofocus: true,
+        content: SizedBox(
+          height: 180,
+          width: 140,
+          child: CupertinoPicker.builder(
+            scrollController: FixedExtentScrollController(initialItem: _page - 1),
+            itemExtent: 38,
+            onSelectedItemChanged: (i) => selected = i + 1,
+            childCount: kQuranPageCount,
+            itemBuilder: (context, i) => Center(
+              child: Text(toEasternDigits(i + 1), style: const TextStyle(fontSize: 18)),
+            ),
+          ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('إلغاء')),
           FilledButton(
-            onPressed: () => Navigator.pop(context, int.tryParse(controller.text)),
+            onPressed: () => Navigator.pop(context, selected),
             child: const Text('انتقال'),
           ),
         ],
@@ -634,21 +641,69 @@ class _SurahBanner extends StatelessWidget {
               style: GoogleFonts.amiriQuran(fontSize: 18 * scale, color: _cream, fontWeight: FontWeight.bold),
             ),
           ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 7 * scale, vertical: 2.5 * scale),
-            decoration: BoxDecoration(
-              color: _gold,
-              borderRadius: BorderRadius.circular(4 * scale),
-            ),
-            child: Text(
-              surah.revelationLabel,
-              style: TextStyle(fontSize: 10.5 * scale, color: _teal, fontWeight: FontWeight.w600),
+          Tooltip(
+            message: surah.revelationLabel,
+            child: Container(
+              width: 18 * scale,
+              height: 18 * scale,
+              padding: EdgeInsets.all(3.5 * scale),
+              decoration: const BoxDecoration(color: _gold, shape: BoxShape.circle),
+              child: CustomPaint(
+                painter: surah.isMeccan ? const _KaabaPainter() : const _MedinaDomePainter(),
+              ),
             ),
           ),
         ],
       ),
     );
   }
+}
+
+/// Simple Kaaba pictogram (a dark cube with the Kiswah's gold band) for the
+/// revelation-place badge — stands in for the "مكية" text.
+class _KaabaPainter extends CustomPainter {
+  const _KaabaPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final body = RRect.fromRectAndRadius(
+      Rect.fromLTWH(size.width * 0.1, size.height * 0.08, size.width * 0.8, size.height * 0.84),
+      Radius.circular(size.width * 0.08),
+    );
+    canvas.drawRRect(body, Paint()..color = const Color(0xFF1C1C1C));
+    canvas.drawRect(
+      Rect.fromLTWH(size.width * 0.1, size.height * 0.4, size.width * 0.8, size.height * 0.16),
+      Paint()..color = const Color(0xFFC9A96A),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _KaabaPainter oldDelegate) => false;
+}
+
+/// Simple Prophet's Mosque pictogram (a green dome with a gold finial) for
+/// the revelation-place badge — stands in for the "مدنية" text.
+class _MedinaDomePainter extends CustomPainter {
+  const _MedinaDomePainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final green = Paint()..color = const Color(0xFF2F6F6B);
+    canvas.drawRect(
+      Rect.fromLTWH(size.width * 0.14, size.height * 0.64, size.width * 0.72, size.height * 0.22),
+      green,
+    );
+    final domeRect = Rect.fromLTWH(size.width * 0.16, size.height * 0.18, size.width * 0.68, size.height * 0.68);
+    canvas.drawArc(domeRect, math.pi, math.pi, true, green);
+    canvas.drawCircle(
+      Offset(size.width * 0.5, size.height * 0.1),
+      size.width * 0.07,
+      Paint()..color = const Color(0xFFC9A96A),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _MedinaDomePainter oldDelegate) => false;
 }
 
 /// Small bordered marker reproducing a real Mushaf page's corner labels
