@@ -50,9 +50,25 @@ Future<void> _ensureMushafFontLoaded(String family) async {
 /// type size on every page. The glyph data itself (which words/ayahs fall
 /// on which page, and their exact orthography) is untouched; only the
 /// display size of that fixed content changes, via a page-specific
-/// [_fitScaleFor] multiplier measured against the real widget tree's font
-/// sizes and spacing so the fit is exact rather than guessed.
-final Map<String, double> _fitScaleCache = {};
+/// [_fitScaleFor] fit measured against the real widget tree's font sizes
+/// and spacing so the fit is exact rather than guessed.
+///
+/// Fitting is two separate knobs, not one, because text only wraps in
+/// whole-line steps: the largest font that still fits can legitimately
+/// leave up to just-under-one-line of blank space, which font size alone
+/// can never close (the next size up would overflow to an extra line).
+/// [_PageFit.fontScale] is chosen first (sizes the glyphs, which also
+/// decides word-to-line wrapping); [_PageFit.leadingBoost] is chosen
+/// second, stretching line/paragraph spacing only — never the glyph size
+/// — to consume whatever that discreteness leaves over, without touching
+/// which words landed on which line.
+class _PageFit {
+  const _PageFit(this.fontScale, this.leadingBoost);
+  final double fontScale;
+  final double leadingBoost;
+}
+
+final Map<String, _PageFit> _fitCache = {};
 
 double _measureHeight(String text, TextStyle style, double maxWidth) {
   final painter = TextPainter(
@@ -67,13 +83,14 @@ double _measureContentHeight(
   double width,
   double scale,
   double fontScale,
+  double leadingBoost,
   String fontFamily,
 ) {
   double total = 0;
   for (var i = 0; i < segments.length; i++) {
     final segment = segments[i];
     if (segment.first.ayahNumber == 1) {
-      if (i != 0) total += 14 * scale * fontScale;
+      if (i != 0) total += 14 * scale * fontScale * leadingBoost;
       total += _measureHeight(
             QuranRepository.instance.surahByNumber(segment.first.surahNumber).name,
             GoogleFonts.amiriQuran(fontSize: 18 * scale * fontScale, fontWeight: FontWeight.bold),
@@ -81,7 +98,7 @@ double _measureContentHeight(
           ) +
           20 * scale * fontScale +
           2;
-      total += 10 * scale * fontScale;
+      total += 10 * scale * fontScale * leadingBoost;
       final surahNumber = segment.first.surahNumber;
       if (surahNumber != 1 && surahNumber != 9) {
         total += _measureHeight(
@@ -89,24 +106,27 @@ double _measureContentHeight(
           GoogleFonts.amiriQuran(fontSize: _kBasmalaFontSize * scale * fontScale),
           width,
         );
-        total += 10 * scale * fontScale;
+        total += 10 * scale * fontScale * leadingBoost;
       }
     }
     total += _measureHeight(
       segment.map((a) => a.glyphText).join(' '),
-      TextStyle(fontFamily: fontFamily, fontSize: _kGlyphFontSize * scale * fontScale, height: _kGlyphLineHeight),
+      TextStyle(fontFamily: fontFamily, fontSize: _kGlyphFontSize * scale * fontScale, height: _kGlyphLineHeight * leadingBoost),
       width,
     );
   }
   return total;
 }
 
-/// Largest font-scale multiplier (clamped to a sane [0.4, 3.0] range) whose
-/// measured content height still fits [height] at [width] — found by binary
-/// search since text height isn't a closed-form function of font size once
-/// line-wrapping is involved. Cached per page/size since the page content
-/// is static and this runs on every build while swiping.
-double _fitScaleFor(
+/// Finds the page's [_PageFit] by binary search in two passes, since text
+/// height isn't a closed-form function of either knob once line-wrapping
+/// is involved. Pass 1 grows [_PageFit.fontScale] (clamped to [0.4, 3.0])
+/// at the reference leading. Pass 2 then grows [_PageFit.leadingBoost]
+/// (clamped to [1.0, 1.8]) with that font scale now fixed, to close
+/// whatever fractional-line gap pass 1 had to leave. Cached per page/size
+/// since the page content is static and this runs on every build while
+/// swiping.
+_PageFit _fitScaleFor(
   int page,
   List<List<MushafAyahGlyph>> segments,
   double width,
@@ -115,21 +135,35 @@ double _fitScaleFor(
   String fontFamily,
 ) {
   final key = '$page:${width.round()}x${height.round()}';
-  final cached = _fitScaleCache[key];
+  final cached = _fitCache[key];
   if (cached != null) return cached;
 
   var lo = 0.4;
   var hi = 3.0;
   for (var i = 0; i < 10; i++) {
     final mid = (lo + hi) / 2;
-    final h = _measureContentHeight(segments, width, scale, mid, fontFamily);
+    final h = _measureContentHeight(segments, width, scale, mid, 1.0, fontFamily);
     if (h <= height) {
       lo = mid;
     } else {
       hi = mid;
     }
   }
-  return _fitScaleCache[key] = lo;
+  final fontScale = lo;
+
+  var leadLo = 1.0;
+  var leadHi = 1.8;
+  for (var i = 0; i < 10; i++) {
+    final mid = (leadLo + leadHi) / 2;
+    final h = _measureContentHeight(segments, width, scale, fontScale, mid, fontFamily);
+    if (h <= height) {
+      leadLo = mid;
+    } else {
+      leadHi = mid;
+    }
+  }
+
+  return _fitCache[key] = _PageFit(fontScale, leadLo);
 }
 
 class QuranReaderScreen extends StatefulWidget {
@@ -403,12 +437,12 @@ class _QuranPageViewState extends State<_QuranPageView> {
               ) +
               10 * scale;
           final contentHeight = cardH - (scrollPadTop + scrollPadBottom) * scale - footerHeight;
-          final fontScale = _fitScaleFor(page, segments, contentWidth, contentHeight, scale, fontFamily);
+          final fit = _fitScaleFor(page, segments, contentWidth, contentHeight, scale, fontFamily);
 
           final style = TextStyle(
             fontFamily: fontFamily,
-            fontSize: _kGlyphFontSize * scale * fontScale,
-            height: _kGlyphLineHeight,
+            fontSize: _kGlyphFontSize * scale * fit.fontScale,
+            height: _kGlyphLineHeight * fit.leadingBoost,
             color: const Color(0xFF2B2117),
           );
 
@@ -445,19 +479,20 @@ class _QuranPageViewState extends State<_QuranPageView> {
                             // earlier surah at its very start.
                             for (final segment in segments) ...[
                               if (segment.first.ayahNumber == 1) ...[
-                                if (segment != segments.first) SizedBox(height: 14 * scale * fontScale),
+                                if (segment != segments.first)
+                                  SizedBox(height: 14 * scale * fit.fontScale * fit.leadingBoost),
                                 _SurahBanner(
                                   surah: QuranRepository.instance.surahByNumber(segment.first.surahNumber),
-                                  scale: scale * fontScale,
+                                  scale: scale * fit.fontScale,
                                 ),
-                                SizedBox(height: 10 * scale * fontScale),
+                                SizedBox(height: 10 * scale * fit.fontScale * fit.leadingBoost),
                                 if (segment.first.surahNumber != 1 && segment.first.surahNumber != 9)
                                   Padding(
-                                    padding: EdgeInsets.only(bottom: 10 * scale * fontScale),
+                                    padding: EdgeInsets.only(bottom: 10 * scale * fit.fontScale * fit.leadingBoost),
                                     child: Text(
                                       'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
                                       textAlign: TextAlign.center,
-                                      style: GoogleFonts.amiriQuran(fontSize: _kBasmalaFontSize * scale * fontScale, color: const Color(0xFF2B2117)),
+                                      style: GoogleFonts.amiriQuran(fontSize: _kBasmalaFontSize * scale * fit.fontScale, color: const Color(0xFF2B2117)),
                                     ),
                                   ),
                               ],
