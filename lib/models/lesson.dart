@@ -12,7 +12,10 @@ sealed class LessonBlock {
 /// A plain paragraph of body text.
 class ParagraphBlock extends LessonBlock {
   final String text;
-  const ParagraphBlock(this.text);
+  /// Small-print citation shown under the paragraph (e.g. a Qur'an/hadith
+  /// reference, a scholarly book, or "اجتهاد فقهي" for non-textual rulings).
+  final String? source;
+  const ParagraphBlock(this.text, {this.source});
 }
 
 /// A sub-heading inside a lesson's body.
@@ -25,7 +28,9 @@ class HeadingBlock extends LessonBlock {
 class BulletsBlock extends LessonBlock {
   final List<String> items;
   final bool numbered;
-  const BulletsBlock(this.items, {this.numbered = false});
+  /// Small-print citation shown once under the whole list.
+  final String? source;
+  const BulletsBlock(this.items, {this.numbered = false, this.source});
 }
 
 /// A single Sharia ruling, optionally attributed to a specific school
@@ -33,7 +38,9 @@ class BulletsBlock extends LessonBlock {
 class RulingCard extends LessonBlock {
   final String? madhhab;
   final String text;
-  const RulingCard(this.text, {this.madhhab});
+  /// Small-print citation shown under the ruling text.
+  final String? source;
+  const RulingCard(this.text, {this.madhhab, this.source});
 }
 
 /// A Qur'an verse or hadith quotation, with its source and, for hadith,
@@ -48,7 +55,9 @@ class QuoteCard extends LessonBlock {
 /// A warning / common-mistake / important-notice callout.
 class WarningCard extends LessonBlock {
   final String text;
-  const WarningCard(this.text);
+  /// Small-print citation shown under the warning text.
+  final String? source;
+  const WarningCard(this.text, {this.source});
 }
 
 /// A supplication entry with its source and an optional note — rendered
@@ -64,7 +73,9 @@ class DuaCard extends LessonBlock {
 class ComparisonTable extends LessonBlock {
   final List<String> headers;
   final List<List<String>> rows;
-  const ComparisonTable({required this.headers, required this.rows});
+  /// Small-print citation shown once under the whole table.
+  final String? source;
+  const ComparisonTable({required this.headers, required this.rows, this.source});
 }
 
 class Lesson {

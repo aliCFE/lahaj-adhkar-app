@@ -187,11 +187,17 @@ class _LessonBlockView extends StatelessWidget {
             textAlign: TextAlign.right,
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17 * textScale, color: Theme.of(context).colorScheme.primary),
           ),
-        ParagraphBlock() => Text(
-            b.text,
-            textDirection: TextDirection.rtl,
-            textAlign: TextAlign.right,
-            style: TextStyle(fontSize: 15 * textScale, height: 1.8),
+        ParagraphBlock() => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                b.text,
+                textDirection: TextDirection.rtl,
+                textAlign: TextAlign.right,
+                style: TextStyle(fontSize: 15 * textScale, height: 1.8),
+              ),
+              if (b.source != null) _SourceCaption(source: b.source!, textScale: textScale),
+            ],
           ),
         BulletsBlock() => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -217,13 +223,20 @@ class _LessonBlockView extends StatelessWidget {
                     ],
                   ),
                 ),
+              if (b.source != null) _SourceCaption(source: b.source!, textScale: textScale),
             ],
           ),
         RulingCard() => _Card(
             color: Theme.of(context).colorScheme.primaryContainer,
             icon: Icons.gavel_rounded,
             label: b.madhhab != null ? 'حكم فقهي — ${b.madhhab}' : 'حكم فقهي',
-            child: Text(b.text, textDirection: TextDirection.rtl, textAlign: TextAlign.right, style: TextStyle(fontSize: 15 * textScale, height: 1.7)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(b.text, textDirection: TextDirection.rtl, textAlign: TextAlign.right, style: TextStyle(fontSize: 15 * textScale, height: 1.7)),
+                if (b.source != null) _SourceCaption(source: b.source!, textScale: textScale),
+              ],
+            ),
           ),
         QuoteCard() => _Card(
             color: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -242,7 +255,13 @@ class _LessonBlockView extends StatelessWidget {
             textColor: Theme.of(context).colorScheme.onTertiaryContainer,
             icon: Icons.info_rounded,
             label: 'تنبيه',
-            child: Text(b.text, textDirection: TextDirection.rtl, textAlign: TextAlign.right, style: TextStyle(fontSize: 14 * textScale, height: 1.7)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(b.text, textDirection: TextDirection.rtl, textAlign: TextAlign.right, style: TextStyle(fontSize: 14 * textScale, height: 1.7)),
+                if (b.source != null) _SourceCaption(source: b.source!, textScale: textScale, color: Theme.of(context).colorScheme.onTertiaryContainer),
+              ],
+            ),
           ),
         DuaCard() => _Card(
             color: Theme.of(context).colorScheme.secondaryContainer,
@@ -265,6 +284,34 @@ class _LessonBlockView extends StatelessWidget {
           ),
         ComparisonTable() => _ComparisonTableView(table: b, textScale: textScale),
       },
+    );
+  }
+}
+
+/// Small-print citation line shown directly under a piece of content, e.g.
+/// "المصدر: سورة البقرة، الآية 183" — distinct from the lesson-wide
+/// "المصادر" list at the bottom, which cites the lesson's general reading.
+class _SourceCaption extends StatelessWidget {
+  const _SourceCaption({required this.source, required this.textScale, this.color});
+  final String source;
+  final double textScale;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Text(
+        'المصدر: $source',
+        textDirection: TextDirection.rtl,
+        textAlign: TextAlign.right,
+        style: TextStyle(
+          fontSize: 11 * textScale,
+          height: 1.4,
+          fontStyle: FontStyle.italic,
+          color: color ?? Theme.of(context).colorScheme.outline,
+        ),
+      ),
     );
   }
 }
@@ -354,6 +401,7 @@ class _ComparisonTableView extends StatelessWidget {
               ],
             ),
           ),
+        if (table.source != null) _SourceCaption(source: table.source!, textScale: textScale),
       ],
     );
   }
