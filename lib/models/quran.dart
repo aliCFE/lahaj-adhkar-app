@@ -70,6 +70,36 @@ class QuranAyah {
   }
 }
 
+/// One ayah's text on a Madinah-Mushaf page, encoded as the exact glyph
+/// sequence its page-specific QCF font expects (one "character" = one
+/// word-ligature glyph, including the trailing ayah-end marker) — sourced
+/// from the official KFGQPC Mushaf data, not derived or approximated.
+class MushafAyahGlyph {
+  final int globalNumber;
+  final int surahNumber;
+  final int ayahNumber;
+  final bool isSajda;
+  final String glyphText;
+
+  const MushafAyahGlyph({
+    required this.globalNumber,
+    required this.surahNumber,
+    required this.ayahNumber,
+    required this.isSajda,
+    required this.glyphText,
+  });
+
+  factory MushafAyahGlyph.fromJson(Map<String, dynamic> json) {
+    return MushafAyahGlyph(
+      globalNumber: json['g'] as int,
+      surahNumber: json['s'] as int,
+      ayahNumber: json['a'] as int,
+      isSajda: json['sj'] as bool,
+      glyphText: json['t'] as String,
+    );
+  }
+}
+
 /// Arabic label for a quarter-hizb position, matching Mushaf margin marks:
 /// quarter 1 = "ربع", 2 = "نصف", 3 = "ثلاثة أرباع", 4 = "حزب" (end of hizb).
 String hizbQuarterLabel(int quarter) {

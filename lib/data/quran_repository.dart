@@ -12,6 +12,7 @@ class QuranRepository {
   List<QuranAyah>? _ayahs;
   Map<int, List<QuranAyah>>? _byPage;
   Map<int, List<QuranAyah>>? _bySurah;
+  Map<int, List<MushafAyahGlyph>>? _mushafByPage;
 
   List<QuranSurah> get surahs => _surahs!;
   List<QuranAyah> get ayahs => _ayahs!;
@@ -22,9 +23,11 @@ class QuranRepository {
     if (_surahs != null) return;
     final surahRaw = await rootBundle.loadString('assets/data/quran/surahs.json');
     final ayahRaw = await rootBundle.loadString('assets/data/quran/ayahs.json');
+    final mushafRaw = await rootBundle.loadString('assets/data/quran/mushaf_pages.json');
 
     final surahJson = jsonDecode(surahRaw) as List<dynamic>;
     final ayahJson = jsonDecode(ayahRaw) as List<dynamic>;
+    final mushafJson = jsonDecode(mushafRaw) as Map<String, dynamic>;
 
     _surahs = surahJson.map((e) => QuranSurah.fromJson(e as Map<String, dynamic>)).toList();
     _ayahs = ayahJson.map((e) => QuranAyah.fromJson(e as Map<String, dynamic>)).toList();
@@ -37,9 +40,25 @@ class QuranRepository {
     }
     _byPage = byPage;
     _bySurah = bySurah;
+
+    _mushafByPage = mushafJson.map(
+      (pageStr, list) => MapEntry(
+        int.parse(pageStr),
+        (list as List<dynamic>)
+            .map((e) => MushafAyahGlyph.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      ),
+    );
   }
 
   List<QuranAyah> ayahsForPage(int page) => _byPage?[page] ?? const [];
+
+  /// Authoritative Madinah-Mushaf page content: the exact glyph text of
+  /// every ayah on [page], sourced directly from the KFGQPC Mushaf data —
+  /// used instead of [ayahsForPage] for Mushaf Mode, since it occasionally
+  /// disagrees by one ayah with Tanzil's own page metadata at a page-turn
+  /// boundary (e.g. 83:35), and the real Mushaf font data wins that tie.
+  List<MushafAyahGlyph> mushafPage(int page) => _mushafByPage?[page] ?? const [];
 
   List<QuranAyah> ayahsForSurah(int surahNumber) => _bySurah?[surahNumber] ?? const [];
 

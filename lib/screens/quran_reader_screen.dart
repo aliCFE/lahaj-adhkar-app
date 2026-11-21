@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -8,31 +9,127 @@ import '../state/app_state.dart';
 import '../theme/arabic_digits.dart';
 import '../widgets/dark_mode_toggle.dart';
 
-/// Mushaf Mode uses a fixed type size, independent of device size or the
-/// app-wide text-size slider — matching how a printed Mushaf has one fixed
-/// type size per edition. Reading Mode (toggle in the app bar) is the
-/// accessible alternative with adjustable size, for users who need it.
-const double _kMushafFontSize = 19;
-const double _kMushafLineHeight = 2.3;
+/// Mushaf Mode renders each page with the official per-page KFGQPC/QCF
+/// Mushaf font (family "QCF_P001".."QCF_P604", one word-accurate ligature
+/// font per page, sourced from the King Fahd Complex Mushaf data). Unlike a
+/// printed Mushaf's one fixed type size, the display size is fit per page
+/// (see [_fitScaleFor]) so a sparse page (e.g. a surah's closing page) fills
+/// the card instead of leaving blank space, and a dense page shrinks just
+/// enough to avoid scrolling. Reading Mode (toggle in the app bar) is the
+/// accessible alternative with the app-wide adjustable text size.
+///
+/// This base size/line-height pair is the reference the per-page fit scale
+/// multiplies: at multiplier 1.0 on a normal 15-line page, normal text
+/// wrapping at the page width this screen renders at reproduces the
+/// Mushaf's own line layout, since the font's per-page glyph advance-widths
+/// were custom-built by the Complex's typesetters for exactly this purpose.
+const double _kGlyphFontSize = 19;
+const double _kGlyphLineHeight = 2.15;
 const double _kBasmalaFontSize = 20;
 
-/// The Quran text data embeds the Basmala as a literal prefix in every
-/// surah's ayah 1 (except At-Tawbah, which has none) — e.g. ayah 2:1 is
-/// "بسم الله الرحمن الرحيم الم". Mushaf Mode renders its own standalone
-/// Basmala line above the text, so that embedded copy is stripped out of
-/// the displayed ayah text to avoid showing it twice. The prefix is taken
-/// from Al-Fatiha's ayah 1 (which *is* exactly the Basmala) rather than
-/// retyped, so it is guaranteed to match the data's exact text byte for
-/// byte, diacritics included.
-String? _basmalaPrefixCache;
-String get _basmalaPrefix =>
-    _basmalaPrefixCache ??= QuranRepository.instance.ayahsForSurah(1).first.text;
+String _mushafFontFamily(int page) => 'QCF_P${page.toString().padLeft(3, '0')}';
 
-String _mushafAyahText(QuranAyah a) {
-  if (a.ayahNumber == 1 && a.surahNumber != 1 && a.text.startsWith(_basmalaPrefix)) {
-    return a.text.substring(_basmalaPrefix.length).trimLeft();
+/// Custom Mushaf fonts are bundled assets, but Flutter only parses one into
+/// the text engine the first time it's actually needed — until then, any
+/// measurement against it (see [_measureHeight]) silently falls back to a
+/// different font's metrics, which would throw off [_fitScaleFor]. Loading
+/// it explicitly first and awaiting completion guarantees the measurement
+/// that follows uses the real glyph widths.
+final Set<String> _loadedMushafFonts = {};
+
+Future<void> _ensureMushafFontLoaded(String family) async {
+  if (_loadedMushafFonts.contains(family)) return;
+  await (FontLoader(family)..addFont(rootBundle.load('assets/fonts/mushaf/$family.TTF'))).load();
+  _loadedMushafFonts.add(family);
+}
+
+/// Auto-fits a page's content to exactly fill the available height with no
+/// leftover blank space and no scrolling: a page with few ayahs renders its
+/// text larger, a page with many words renders it smaller — product
+/// direction takes this over literally keeping the printed Mushaf's fixed
+/// type size on every page. The glyph data itself (which words/ayahs fall
+/// on which page, and their exact orthography) is untouched; only the
+/// display size of that fixed content changes, via a page-specific
+/// [_fitScaleFor] multiplier measured against the real widget tree's font
+/// sizes and spacing so the fit is exact rather than guessed.
+final Map<String, double> _fitScaleCache = {};
+
+double _measureHeight(String text, TextStyle style, double maxWidth) {
+  final painter = TextPainter(
+    text: TextSpan(text: text, style: style),
+    textDirection: TextDirection.rtl,
+  )..layout(maxWidth: maxWidth < 1 ? 1 : maxWidth);
+  return painter.height;
+}
+
+double _measureContentHeight(
+  List<List<MushafAyahGlyph>> segments,
+  double width,
+  double scale,
+  double fontScale,
+  String fontFamily,
+) {
+  double total = 0;
+  for (var i = 0; i < segments.length; i++) {
+    final segment = segments[i];
+    if (segment.first.ayahNumber == 1) {
+      if (i != 0) total += 14 * scale * fontScale;
+      total += _measureHeight(
+            QuranRepository.instance.surahByNumber(segment.first.surahNumber).name,
+            GoogleFonts.amiriQuran(fontSize: 18 * scale * fontScale, fontWeight: FontWeight.bold),
+            width - 24 * scale * fontScale,
+          ) +
+          20 * scale * fontScale +
+          2;
+      total += 10 * scale * fontScale;
+      final surahNumber = segment.first.surahNumber;
+      if (surahNumber != 1 && surahNumber != 9) {
+        total += _measureHeight(
+          'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+          GoogleFonts.amiriQuran(fontSize: _kBasmalaFontSize * scale * fontScale),
+          width,
+        );
+        total += 10 * scale * fontScale;
+      }
+    }
+    total += _measureHeight(
+      segment.map((a) => a.glyphText).join(' '),
+      TextStyle(fontFamily: fontFamily, fontSize: _kGlyphFontSize * scale * fontScale, height: _kGlyphLineHeight),
+      width,
+    );
   }
-  return a.text;
+  return total;
+}
+
+/// Largest font-scale multiplier (clamped to a sane [0.4, 3.0] range) whose
+/// measured content height still fits [height] at [width] — found by binary
+/// search since text height isn't a closed-form function of font size once
+/// line-wrapping is involved. Cached per page/size since the page content
+/// is static and this runs on every build while swiping.
+double _fitScaleFor(
+  int page,
+  List<List<MushafAyahGlyph>> segments,
+  double width,
+  double height,
+  double scale,
+  String fontFamily,
+) {
+  final key = '$page:${width.round()}x${height.round()}';
+  final cached = _fitScaleCache[key];
+  if (cached != null) return cached;
+
+  var lo = 0.4;
+  var hi = 3.0;
+  for (var i = 0; i < 10; i++) {
+    final mid = (lo + hi) / 2;
+    final h = _measureContentHeight(segments, width, scale, mid, fontFamily);
+    if (h <= height) {
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
+  return _fitScaleCache[key] = lo;
 }
 
 class QuranReaderScreen extends StatefulWidget {
@@ -207,26 +304,69 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
   }
 }
 
-/// Mushaf Mode: fixed-size paged "open book" layout.
-class _QuranPageView extends StatelessWidget {
+/// Mushaf Mode: paged "open book" layout, scaled dynamically to fill the
+/// available space (phone portrait/landscape, tablet any orientation)
+/// while preserving the page's aspect ratio — so the page always renders
+/// as large as the screen allows without distorting its proportions.
+class _QuranPageView extends StatefulWidget {
   const _QuranPageView({required this.page});
   final int page;
 
   @override
+  State<_QuranPageView> createState() => _QuranPageViewState();
+}
+
+class _QuranPageViewState extends State<_QuranPageView> {
+  // Reference card content size at the original design scale (the fixed
+  // 14/10 outer padding below is excluded from it) — every size inside the
+  // page (font, margins, banner) scales relative to this, so enlarging the
+  // page changes its overall size only, never its internal proportions.
+  static const double _refCardWidth = 480 - 28;
+  static const double _refCardHeight = 760 - 20;
+  static const double _refAspectRatio = _refCardWidth / _refCardHeight;
+
+  late Future<void> _fontReady = _ensurePageFontsLoaded(widget.page);
+
+  // Both the per-page QCF font and GoogleFonts' amiriQuran (banner + Basmala)
+  // need to be fully loaded before measuring, or [_fitScaleFor] measures
+  // against fallback-font metrics instead of the real glyph widths.
+  static Future<void> _ensurePageFontsLoaded(int page) => Future.wait([
+        _ensureMushafFontLoaded(_mushafFontFamily(page)),
+        GoogleFonts.pendingFonts(),
+      ]);
+
+  @override
+  void didUpdateWidget(covariant _QuranPageView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.page != widget.page) {
+      _fontReady = _ensurePageFontsLoaded(widget.page);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final ayahs = QuranRepository.instance.ayahsForPage(page);
-    final style = GoogleFonts.amiriQuran(
-      fontSize: _kMushafFontSize,
-      height: _kMushafLineHeight,
-      color: const Color(0xFF2B2117),
+    return FutureBuilder<void>(
+      future: _fontReady,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        return _buildPage(context);
+      },
     );
+  }
+
+  Widget _buildPage(BuildContext context) {
+    final page = widget.page;
+    final glyphAyahs = QuranRepository.instance.mushafPage(page);
+    final fontFamily = _mushafFontFamily(page);
 
     // A page can contain several short surahs back to back (common near
     // the end of the Mushaf), so the ayahs are split into per-surah runs —
     // each run gets its own banner + Basmala when it starts a surah,
     // instead of only the page's very first ayah.
-    final segments = <List<QuranAyah>>[];
-    for (final a in ayahs) {
+    final segments = <List<MushafAyahGlyph>>[];
+    for (final a in glyphAyahs) {
       if (segments.isEmpty || segments.last.first.surahNumber != a.surahNumber) {
         segments.add([a]);
       } else {
@@ -234,95 +374,123 @@ class _QuranPageView extends StatelessWidget {
       }
     }
 
-    // On tablets/iPad the available area is much bigger than a printed
-    // Mushaf page, so the page card is capped to a book-like size and
-    // centered — like a real page on a table — instead of stretching to
-    // fill the screen. On phones these caps simply don't bind.
     return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 480, maxHeight: 760),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFFFBF6E9),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: const Color(0xFFC9A96A), width: 1.4),
-              boxShadow: const [
-                BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4)),
-              ],
-            ),
-            child: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
-                    child: Directionality(
-                      textDirection: TextDirection.rtl,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // Every segment but the first necessarily opens a
-                          // surah at its ayah 1 — a page only continues an
-                          // earlier surah at its very start.
-                          for (final segment in segments) ...[
-                            if (segment.first.ayahNumber == 1) ...[
-                              if (segment != segments.first) const SizedBox(height: 14),
-                              _SurahBanner(
-                                surah: QuranRepository.instance.surahByNumber(segment.first.surahNumber),
-                              ),
-                              const SizedBox(height: 10),
-                              if (segment.first.surahNumber != 1 && segment.first.surahNumber != 9)
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 10),
-                                  child: Text(
-                                    'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.amiriQuran(fontSize: _kBasmalaFontSize, color: const Color(0xFF2B2117)),
-                                  ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final budgetW = constraints.maxWidth - 28;
+          final budgetH = constraints.maxHeight - 20;
+          double cardW = budgetW;
+          double cardH = cardW / _refAspectRatio;
+          if (cardH > budgetH) {
+            cardH = budgetH;
+            cardW = cardH * _refAspectRatio;
+          }
+          // Mild safety clamp so an extreme desktop-sized window doesn't
+          // blow the page up to a comically large font.
+          final scale = (cardW / _refCardWidth).clamp(0.5, 2.0);
+
+          // Solve for the content-fit multiplier that makes this page's own
+          // ayahs exactly fill the card's content area — mirrors the padding
+          // and footer sizing below so the measurement matches what's drawn.
+          const scrollPadH = 18.0;
+          const scrollPadTop = 18.0;
+          const scrollPadBottom = 8.0;
+          final contentWidth = cardW - 2 * scrollPadH * scale;
+          final footerHeight = _measureHeight(
+                toEasternDigits(page),
+                TextStyle(fontWeight: FontWeight.bold, fontSize: 14 * scale),
+                cardW,
+              ) +
+              10 * scale;
+          final contentHeight = cardH - (scrollPadTop + scrollPadBottom) * scale - footerHeight;
+          final fontScale = _fitScaleFor(page, segments, contentWidth, contentHeight, scale, fontFamily);
+
+          final style = TextStyle(
+            fontFamily: fontFamily,
+            fontSize: _kGlyphFontSize * scale * fontScale,
+            height: _kGlyphLineHeight,
+            color: const Color(0xFF2B2117),
+          );
+
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+            child: Container(
+              width: cardW,
+              height: cardH,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFBF6E9),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: const Color(0xFFC9A96A), width: 1.4),
+                boxShadow: const [
+                  BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4)),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(
+                        scrollPadH * scale,
+                        scrollPadTop * scale,
+                        scrollPadH * scale,
+                        scrollPadBottom * scale,
+                      ),
+                      child: Directionality(
+                        textDirection: TextDirection.rtl,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Every segment but the first necessarily opens a
+                            // surah at its ayah 1 — a page only continues an
+                            // earlier surah at its very start.
+                            for (final segment in segments) ...[
+                              if (segment.first.ayahNumber == 1) ...[
+                                if (segment != segments.first) SizedBox(height: 14 * scale * fontScale),
+                                _SurahBanner(
+                                  surah: QuranRepository.instance.surahByNumber(segment.first.surahNumber),
+                                  scale: scale * fontScale,
                                 ),
-                            ],
-                            RichText(
-                              textAlign: TextAlign.justify,
-                              text: TextSpan(
-                                style: style,
-                                children: [
-                                  for (final a in segment) ...[
-                                    TextSpan(text: _mushafAyahText(a)),
-                                    // A plain-text marker, not a WidgetSpan: Flutter
-                                    // can misplace WidgetSpans relative to their
-                                    // surrounding text in justified RTL paragraphs
-                                    // (flutter/flutter#111381), which showed up here
-                                    // as ayah-end circles landing on the wrong ayah.
-                                    // ۩ marks a sajda ayah, matching print convention.
-                                    TextSpan(
-                                      text: ' ﴿${toEasternDigits(a.ayahNumber)}${a.isSajda ? '۩' : ''}﴾ ',
-                                      style: const TextStyle(
-                                        color: Color(0xFFB08D57),
-                                        fontSize: 13,
-                                      ),
+                                SizedBox(height: 10 * scale * fontScale),
+                                if (segment.first.surahNumber != 1 && segment.first.surahNumber != 9)
+                                  Padding(
+                                    padding: EdgeInsets.only(bottom: 10 * scale * fontScale),
+                                    child: Text(
+                                      'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.amiriQuran(fontSize: _kBasmalaFontSize * scale * fontScale, color: const Color(0xFF2B2117)),
                                     ),
-                                  ],
-                                ],
+                                  ),
+                              ],
+                              // The ayah-end ornament (circle + number) is already
+                              // baked into each ayah's glyph sequence by the official
+                              // Mushaf font data — joining the segment's ayahs with a
+                              // plain space reproduces the exact printed text, with no
+                              // separately-styled marker needed (and no risk of the
+                              // WidgetSpan RTL-justification bug the old marker-based
+                              // approach had to work around).
+                              Text(
+                                segment.map((a) => a.glyphText).join(' '),
+                                textAlign: TextAlign.justify,
+                                style: style,
                               ),
-                            ),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Text(
-                    toEasternDigits(page),
-                    style: const TextStyle(color: Color(0xFFB08D57), fontWeight: FontWeight.bold),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 10 * scale),
+                    child: Text(
+                      toEasternDigits(page),
+                      style: TextStyle(color: const Color(0xFFB08D57), fontWeight: FontWeight.bold, fontSize: 14 * scale),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -376,13 +544,14 @@ class _QuranReadingModePage extends StatelessWidget {
 }
 
 class _SurahBanner extends StatelessWidget {
-  const _SurahBanner({required this.surah});
+  const _SurahBanner({required this.surah, required this.scale});
   final QuranSurah surah;
+  final double scale;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      padding: EdgeInsets.symmetric(vertical: 10 * scale, horizontal: 12 * scale),
       decoration: BoxDecoration(
         color: const Color(0xFFF1E6C8),
         borderRadius: BorderRadius.circular(4),
@@ -394,12 +563,12 @@ class _SurahBanner extends StatelessWidget {
             child: Text(
               surah.name,
               textAlign: TextAlign.center,
-              style: GoogleFonts.amiriQuran(fontSize: 18, color: const Color(0xFF6B4F1D), fontWeight: FontWeight.bold),
+              style: GoogleFonts.amiriQuran(fontSize: 18 * scale, color: const Color(0xFF6B4F1D), fontWeight: FontWeight.bold),
             ),
           ),
           Text(
             surah.revelationLabel,
-            style: const TextStyle(fontSize: 11, color: Color(0xFF6B4F1D)),
+            style: TextStyle(fontSize: 11 * scale, color: const Color(0xFF6B4F1D)),
           ),
         ],
       ),
