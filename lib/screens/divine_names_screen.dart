@@ -65,16 +65,31 @@ class _DivineNamesScreenState extends State<DivineNamesScreen> {
                 ),
               ),
               Expanded(
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 1.05,
-                  ),
-                  itemCount: filtered.length,
-                  itemBuilder: (context, i) => _NameCard(entry: filtered[i]),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final width = constraints.maxWidth;
+                    // Same breakpoints as the home screen's tile grid — fixes
+                    // cards ballooning into huge, mostly-empty squares on
+                    // tablet/desktop widths (a fixed 2-column count stretched
+                    // each card to half the viewport).
+                    final columns = width >= 900 ? 4 : (width >= 600 ? 3 : 2);
+                    return Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1000),
+                        child: GridView.builder(
+                          padding: const EdgeInsets.all(16),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: columns,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            childAspectRatio: 1.05,
+                          ),
+                          itemCount: filtered.length,
+                          itemBuilder: (context, i) => _NameCard(entry: filtered[i]),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
