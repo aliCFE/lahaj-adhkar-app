@@ -505,7 +505,7 @@ class _QuranPageViewState extends State<_QuranPageView> {
                               // approach had to work around).
                               Text(
                                 segment.map((a) => a.glyphText).join(' '),
-                                textAlign: TextAlign.justify,
+                                textAlign: TextAlign.right,
                                 style: style,
                               ),
                             ],
