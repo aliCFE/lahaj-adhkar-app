@@ -73,7 +73,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                 child: DhikrCard(
                   item: items[i],
                   onCompleted: i < items.length - 1
-                      ? () => Future.delayed(const Duration(milliseconds: 500), () {
+                      ? () => Future.delayed(const Duration(milliseconds: 150), () {
                             if (!mounted) return;
                             _controller.nextPage(
                               duration: const Duration(milliseconds: 250),
