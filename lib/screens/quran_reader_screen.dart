@@ -659,21 +659,47 @@ class _SurahBanner extends StatelessWidget {
   }
 }
 
-/// Simple Kaaba pictogram (a dark cube with the Kiswah's gold band) for the
-/// revelation-place badge — stands in for the "مكية" text.
+/// Kaaba pictogram — the cube, the Kiswah's gold embroidered belt (Hizam),
+/// the gold rain spout (Mizab al-Rahma) on the roofline, and the door (Bab
+/// al-Kaaba) — for the revelation-place badge, standing in for "مكية".
 class _KaabaPainter extends CustomPainter {
   const _KaabaPainter();
 
   @override
   void paint(Canvas canvas, Size size) {
-    final body = RRect.fromRectAndRadius(
-      Rect.fromLTWH(size.width * 0.1, size.height * 0.08, size.width * 0.8, size.height * 0.84),
-      Radius.circular(size.width * 0.08),
+    final w = size.width;
+    final h = size.height;
+    const black = Color(0xFF1C1C1C);
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(w * 0.08, h * 0.12, w * 0.84, h * 0.84),
+        Radius.circular(w * 0.06),
+      ),
+      Paint()..color = black,
     );
-    canvas.drawRRect(body, Paint()..color = const Color(0xFF1C1C1C));
+
+    // Gold rain spout (Mizab al-Rahma) emerging from the roofline.
     canvas.drawRect(
-      Rect.fromLTWH(size.width * 0.1, size.height * 0.4, size.width * 0.8, size.height * 0.16),
-      Paint()..color = const Color(0xFFC9A96A),
+      Rect.fromLTWH(w * 0.58, h * 0.02, w * 0.14, h * 0.15),
+      Paint()..color = _SurahBanner._gold,
+    );
+
+    // Kiswah's embroidered gold belt (Hizam), roughly two-thirds up.
+    canvas.drawRect(
+      Rect.fromLTWH(w * 0.08, h * 0.52, w * 0.84, h * 0.15),
+      Paint()..color = _SurahBanner._gold,
+    );
+
+    // The door (Bab al-Kaaba), set into the lower face.
+    final door = Rect.fromLTWH(w * 0.54, h * 0.72, w * 0.2, h * 0.24);
+    canvas.drawRect(door, Paint()..color = _SurahBanner._gold);
+    canvas.drawRect(
+      door,
+      Paint()
+        ..color = black
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = w * 0.035,
     );
   }
 
@@ -681,25 +707,40 @@ class _KaabaPainter extends CustomPainter {
   bool shouldRepaint(covariant _KaabaPainter oldDelegate) => false;
 }
 
-/// Simple Prophet's Mosque pictogram (a green dome with a gold finial) for
-/// the revelation-place badge — stands in for the "مدنية" text.
+/// Prophet's Mosque pictogram — the Green Dome (Qubbat al-Khadra) in its
+/// true onion/bulb silhouette, sitting on its drum, with a gold crescent
+/// finial — for the revelation-place badge, standing in for "مدنية".
 class _MedinaDomePainter extends CustomPainter {
   const _MedinaDomePainter();
 
   @override
   void paint(Canvas canvas, Size size) {
-    final green = Paint()..color = const Color(0xFF2F6F6B);
-    canvas.drawRect(
-      Rect.fromLTWH(size.width * 0.14, size.height * 0.64, size.width * 0.72, size.height * 0.22),
-      green,
+    final w = size.width;
+    final h = size.height;
+
+    // The mosque's base/drum beneath the dome.
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(w * 0.22, h * 0.66, w * 0.56, h * 0.28),
+        Radius.circular(w * 0.04),
+      ),
+      Paint()..color = _SurahBanner._cream,
     );
-    final domeRect = Rect.fromLTWH(size.width * 0.16, size.height * 0.18, size.width * 0.68, size.height * 0.68);
-    canvas.drawArc(domeRect, math.pi, math.pi, true, green);
-    canvas.drawCircle(
-      Offset(size.width * 0.5, size.height * 0.1),
-      size.width * 0.07,
-      Paint()..color = const Color(0xFFC9A96A),
-    );
+
+    // The green onion dome (Qubbat al-Khadra) — apex, bulge, then a neck
+    // down to the drum, mirrored on both sides.
+    final dome = Path()
+      ..moveTo(w * 0.5, h * 0.06)
+      ..cubicTo(w * 0.82, h * 0.10, w * 0.86, h * 0.40, w * 0.64, h * 0.54)
+      ..lineTo(w * 0.64, h * 0.68)
+      ..lineTo(w * 0.36, h * 0.68)
+      ..lineTo(w * 0.36, h * 0.54)
+      ..cubicTo(w * 0.14, h * 0.40, w * 0.18, h * 0.10, w * 0.5, h * 0.06)
+      ..close();
+    canvas.drawPath(dome, Paint()..color = _SurahBanner._teal);
+
+    // Gold crescent finial on top.
+    canvas.drawCircle(Offset(w * 0.5, h * 0.03), w * 0.07, Paint()..color = _SurahBanner._gold);
   }
 
   @override
