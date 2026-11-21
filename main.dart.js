@@ -101030,7 +101030,7 @@ A.eP(r,!1,t.W).Ot(s.gfK())},
 $S:5}
 A.aB1.prototype={
 $1(a){var s=null,r=this.a
-return new A.tM(B.akd,A.fU(new A.A1(A.aZB(this.b.gfK()-1),38,new A.aAY(r),new A.agV(new A.aAZ(),604),s),180,140),A.b([A.Vz(B.akH,new A.aB_(a),s),new A.AJ(!1,new A.aB0(r,a),s,s,s,s,B.r,s,!1,s,!0,s,B.akv,s)],t.p),s)},
+return new A.tM(B.akc,A.fU(new A.A1(A.aZB(this.b.gfK()-1),38,new A.aAY(r),new A.agV(new A.aAZ(),604),s),180,140),A.b([A.Vz(B.akH,new A.aB_(a),s),new A.AJ(!1,new A.aB0(r,a),s,s,s,s,B.r,s,!1,s,!0,s,B.akv,s)],t.p),s)},
 $S:622}
 A.aAY.prototype={
 $1(a){return this.a.a=a+1},
@@ -101359,7 +101359,7 @@ q=A.ao("\u0639\u0646 \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0648\u0627\u06
 p=A.akC(B.So,B.akk,new A.apX(this,a))
 o=A.ao("\u0634\u0643\u0631 \u0648\u062a\u0642\u062f\u064a\u0631",m,m,m,m,A.z(a).ok.w,B.bJ,m)
 n=A.bI(12)
-return A.fi(k,m,A.qw(A.b([j,B.hM,i,B.aW,h,s,r,B.lV,q,B.aW,B.aku,B.f9,p,B.lV,o,B.aW,B.akc,B.cT,A.de(A.dp(m,A.afB("assets/icon/nova_logo_white.png",m,160),B.r,m,new A.ck(B.NY,m,m,n,m,m,B.an),m,m,m,B.b4,m,m,m),m,m)],t.p),m,B.b4,B.ac),m)}}
+return A.fi(k,m,A.qw(A.b([j,B.hM,i,B.aW,h,s,r,B.lV,q,B.aW,B.aku,B.f9,p,B.lV,o,B.aW,B.akd,B.cT,A.de(A.dp(m,A.afB("assets/icon/nova_logo_white.png",m,160),B.r,m,new A.ck(B.NY,m,m,n,m,m,B.an),m,m,m,B.b4,m,m,m),m,m)],t.p),m,B.b4,B.ac),m)}}
 A.apW.prototype={
 $1(a){return this.a.EL(a)},
 $S:49}
@@ -110269,9 +110269,9 @@ B.ak7=new A.ea(B.ahG,B.agy,B.ahH,B.aia,B.age,B.agm,B.agU,B.ai4,B.ah5,B.aiE,B.afH
 B.ak9=new A.bS("\u0623\u0631\u064a\u062f \u062f\u0639\u0627\u0621\u064b \u0639\u0627\u0645\u064b\u0627 \u2014 \u062a\u0635\u0641\u0651\u062d \u0643\u0644 \u0627\u0644\u0623\u0630\u0643\u0627\u0631",null,null,null,null,null,null,null,null,null)
 B.aka=new A.bS("\u062d\u062c\u0645 \u0627\u0644\u062e\u0637",null,null,null,null,null,null,null,null,null)
 B.akb=new A.bS("\u0627\u0644\u062a\u0627\u0644\u064a\u0629",null,null,null,null,null,null,null,null,null)
+B.akc=new A.bS("\u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u0635\u0641\u062d\u0629",null,null,null,null,null,null,null,null,null)
 B.Je=new A.k(!0,null,null,null,null,null,null,null,null,null,null,null,1.6,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.akc=new A.bS("\u0628\u0631\u0645\u062c\u0629 \u0648\u062a\u0635\u0645\u064a\u0645 \u0627\u0644\u0645\u0647\u0646\u062f\u0633 \u0639\u0644\u064a \u0645\u062d\u0645\u062f \u0627\u0644\u0639\u0627\u0646\u064a",null,B.Je,B.bJ,null,null,null,null,null,null)
-B.akd=new A.bS("\u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644 \u0625\u0644\u0649 \u0635\u0641\u062d\u0629",null,null,null,null,null,null,null,null,null)
+B.akd=new A.bS("\u0628\u062f\u0639\u0645 \u0648\u0631\u0639\u0627\u064a\u0629 \u0627\u0644\u0627\u0633\u062a\u0627\u0630 \u062d\u0630\u064a\u0641\u0629 \u0633\u0639\u062f \u0627\u0644\u0642\u0637\u0627\u0646 \u0648\u0628\u0631\u0645\u062c\u0629 \u0648\u062a\u0635\u0645\u064a\u0645 \u0627\u0644\u0645\u0647\u0646\u062f\u0633 \u0639\u0644\u064a \u0645\u062d\u0645\u062f \u0627\u0644\u0639\u0627\u0646\u064a \u0627\u0644\u062a\u0627\u0628\u0639 \u0644\u0634\u0631\u0643\u0629 Nova",null,B.Je,B.bJ,null,null,null,null,null,null)
 B.ahq=new A.k(!0,B.l,null,null,null,null,19,B.a8,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.akf=new A.bS("\u0631\u062d\u0644\u062a\u0643 \u0625\u0644\u0649 \u0628\u064a\u062a \u0627\u0644\u0644\u0647 \u0627\u0644\u062d\u0631\u0627\u0645",null,B.ahq,null,null,null,null,null,null,null)
 B.akg=new A.bS("\u0627\u0644\u062a\u0646\u0628\u064a\u0647 \u0627\u0644\u0644\u0645\u0633\u064a \u0639\u0646\u062f \u0625\u0643\u0645\u0627\u0644 \u0627\u0644\u0630\u0643\u0631",null,null,null,null,null,null,null,null,null)
