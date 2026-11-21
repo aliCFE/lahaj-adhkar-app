@@ -226,7 +226,8 @@ class _LessonBlockView extends StatelessWidget {
             child: Text(b.text, textDirection: TextDirection.rtl, textAlign: TextAlign.right, style: TextStyle(fontSize: 15 * textScale, height: 1.7)),
           ),
         QuoteCard() => _Card(
-            color: const Color(0xFFF0E6D2),
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            textColor: Theme.of(context).colorScheme.onSurface,
             icon: Icons.menu_book_rounded,
             label: b.grade != null ? '${b.source} — ${b.grade}' : b.source,
             child: Text(

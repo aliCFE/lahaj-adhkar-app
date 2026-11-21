@@ -8,9 +8,14 @@ import '../state/app_state.dart';
 import '../theme/app_theme.dart';
 
 class DhikrCard extends StatelessWidget {
-  const DhikrCard({super.key, required this.item});
+  const DhikrCard({super.key, required this.item, this.onCompleted});
 
   final DhikrItem item;
+
+  /// Called right after a tap brings the counter to its target (e.g. "3/3"),
+  /// so the reader screen can move on to the next dhikr automatically.
+  /// Never called for open-ended (no fixed count) dhikr.
+  final VoidCallback? onCompleted;
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +71,7 @@ class DhikrCard extends StatelessWidget {
               ),
             ],
             const SizedBox(height: 16),
-            _RepeatCounter(item: item, progress: progress),
+            _RepeatCounter(item: item, progress: progress, onCompleted: onCompleted),
             const SizedBox(height: 12),
             _SourceFooter(sources: item.sources),
           ],
@@ -77,10 +82,11 @@ class DhikrCard extends StatelessWidget {
 }
 
 class _RepeatCounter extends StatelessWidget {
-  const _RepeatCounter({required this.item, required this.progress});
+  const _RepeatCounter({required this.item, required this.progress, this.onCompleted});
 
   final DhikrItem item;
   final int progress;
+  final VoidCallback? onCompleted;
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +99,8 @@ class _RepeatCounter extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       onTap: () {
         if (appState.haptics) HapticFeedback.lightImpact();
-        appState.advance(item);
+        final next = appState.advance(item);
+        if (!isOpen && next == item.repeatCount.n) onCompleted?.call();
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),

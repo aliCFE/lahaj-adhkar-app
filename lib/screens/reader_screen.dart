@@ -70,7 +70,18 @@ class _ReaderScreenState extends State<ReaderScreen> {
                 context.read<AppState>().markRecent(items[i].id);
               },
               itemBuilder: (context, i) => SingleChildScrollView(
-                child: DhikrCard(item: items[i]),
+                child: DhikrCard(
+                  item: items[i],
+                  onCompleted: i < items.length - 1
+                      ? () => Future.delayed(const Duration(milliseconds: 500), () {
+                            if (!mounted) return;
+                            _controller.nextPage(
+                              duration: const Duration(milliseconds: 250),
+                              curve: Curves.easeOut,
+                            );
+                          })
+                      : null,
+                ),
               ),
             ),
           ),

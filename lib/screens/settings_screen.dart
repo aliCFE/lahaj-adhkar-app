@@ -73,10 +73,11 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           const Divider(height: 32),
-          Text('شكر وتقدير', style: Theme.of(context).textTheme.titleMedium),
+          Text('شكر وتقدير', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.center),
           const SizedBox(height: 8),
           const Text(
-            'بدعم ورعاية حذيفة، وبرمجة وتطوير شركة Nova.',
+            'بدعم ورعاية الاستاذ حذيفة سعد القطان وبرمجة ورعاية المهندس علي محمد العاني التابع لشركة Nova',
+            textAlign: TextAlign.center,
             style: TextStyle(height: 1.6),
           ),
           const SizedBox(height: 12),
