@@ -254,7 +254,9 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
           const DarkModeToggle(),
         ],
       ),
-      backgroundColor: _readingMode ? null : const Color(0xFFEDE6D6),
+      // Same warm parchment backdrop in both modes — Reading Mode's card
+      // needs it too, instead of falling back to the app's dark/light theme.
+      backgroundColor: const Color(0xFFEDE6D6),
       body: Column(
         children: [
           // Mushaf Mode shows this on the page itself (see _MarginLabel) —
@@ -573,6 +575,14 @@ class _QuranReadingModePage extends StatelessWidget {
   const _QuranReadingModePage({required this.page});
   final int page;
 
+  // Same fixed parchment palette as Mushaf Mode's card (see _QuranPageView),
+  // kept independent of the app's light/dark theme so this page reads like
+  // paper rather than a chat bubble.
+  static const _ink = Color(0xFF2B2117);
+  static const _cream = Color(0xFFFBF6E9);
+  static const _gold = Color(0xFFC9A96A);
+  static const _teal = Color(0xFF2F6F6B);
+
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
@@ -580,7 +590,7 @@ class _QuranReadingModePage extends StatelessWidget {
     final style = GoogleFonts.amiriQuran(
       fontSize: 22 * appState.textScale,
       height: 2.1,
-      color: Theme.of(context).colorScheme.onSurface,
+      color: _ink,
     );
 
     return SingleChildScrollView(
@@ -590,21 +600,32 @@ class _QuranReadingModePage extends StatelessWidget {
           // Caps the line length on tablets so justified Arabic text stays
           // comfortable to read instead of stretching edge to edge.
           constraints: const BoxConstraints(maxWidth: 640),
-          child: Directionality(
-            textDirection: TextDirection.rtl,
-            child: RichText(
-              textAlign: TextAlign.justify,
-              text: TextSpan(
-                style: style,
-                children: [
-                  for (final a in ayahs) ...[
-                    TextSpan(text: a.text),
-                    TextSpan(
-                      text: ' ﴿${toEasternDigits(a.ayahNumber)}﴾ ',
-                      style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16 * appState.textScale),
-                    ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 24),
+            decoration: BoxDecoration(
+              color: _cream,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: _gold, width: 1.2),
+              boxShadow: const [
+                BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4)),
+              ],
+            ),
+            child: Directionality(
+              textDirection: TextDirection.rtl,
+              child: RichText(
+                textAlign: TextAlign.justify,
+                text: TextSpan(
+                  style: style,
+                  children: [
+                    for (final a in ayahs) ...[
+                      TextSpan(text: a.text),
+                      TextSpan(
+                        text: ' ﴿${toEasternDigits(a.ayahNumber)}﴾ ',
+                        style: TextStyle(color: _teal, fontWeight: FontWeight.bold, fontSize: 16 * appState.textScale),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ),
@@ -707,11 +728,13 @@ class _KaabaPainter extends CustomPainter {
   bool shouldRepaint(covariant _KaabaPainter oldDelegate) => false;
 }
 
-/// Prophet's Mosque pictogram — the Green Dome (Qubbat al-Khadra) in its
-/// true onion/bulb silhouette, sitting on its drum, with a gold crescent
+/// Prophet's Mosque pictogram — the Green Dome (Qubbat al-Khadra) as one
+/// smooth rounded bulge on its drum, with a gold trim seam and crescent
 /// finial — for the revelation-place badge, standing in for "مدنية".
 class _MedinaDomePainter extends CustomPainter {
   const _MedinaDomePainter();
+
+  static const _domeGreen = Color(0xFF1F7A4D);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -721,23 +744,27 @@ class _MedinaDomePainter extends CustomPainter {
     // The mosque's base/drum beneath the dome.
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(w * 0.22, h * 0.66, w * 0.56, h * 0.28),
-        Radius.circular(w * 0.04),
+        Rect.fromLTWH(w * 0.2, h * 0.64, w * 0.6, h * 0.3),
+        Radius.circular(w * 0.05),
       ),
       Paint()..color = _SurahBanner._cream,
     );
 
-    // The green onion dome (Qubbat al-Khadra) — apex, bulge, then a neck
-    // down to the drum, mirrored on both sides.
+    // The green dome (Qubbat al-Khadra) — one smooth curve per side, no
+    // pinched neck, so it stays a clean silhouette at this small size.
     final dome = Path()
-      ..moveTo(w * 0.5, h * 0.06)
-      ..cubicTo(w * 0.82, h * 0.10, w * 0.86, h * 0.40, w * 0.64, h * 0.54)
-      ..lineTo(w * 0.64, h * 0.68)
-      ..lineTo(w * 0.36, h * 0.68)
-      ..lineTo(w * 0.36, h * 0.54)
-      ..cubicTo(w * 0.14, h * 0.40, w * 0.18, h * 0.10, w * 0.5, h * 0.06)
+      ..moveTo(w * 0.5, h * 0.08)
+      ..quadraticBezierTo(w * 0.84, h * 0.1, w * 0.76, h * 0.62)
+      ..lineTo(w * 0.24, h * 0.62)
+      ..quadraticBezierTo(w * 0.16, h * 0.1, w * 0.5, h * 0.08)
       ..close();
-    canvas.drawPath(dome, Paint()..color = _SurahBanner._teal);
+    canvas.drawPath(dome, Paint()..color = _domeGreen);
+
+    // Thin gold trim where the dome meets the drum.
+    canvas.drawRect(
+      Rect.fromLTWH(w * 0.22, h * 0.6, w * 0.56, h * 0.045),
+      Paint()..color = _SurahBanner._gold,
+    );
 
     // Gold crescent finial on top.
     canvas.drawCircle(Offset(w * 0.5, h * 0.03), w * 0.07, Paint()..color = _SurahBanner._gold);
