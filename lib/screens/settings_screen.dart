@@ -76,7 +76,7 @@ class SettingsScreen extends StatelessWidget {
           Text('شكر وتقدير', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.center),
           const SizedBox(height: 8),
           const Text(
-            'برمجة وتصميم المهندس علي محمد العاني',
+            'بدعم ورعاية الاستاذ حذيفة سعد القطان وبرمجة وتصميم المهندس علي محمد العاني التابع لشركة Nova',
             textAlign: TextAlign.center,
             style: TextStyle(height: 1.6),
           ),
