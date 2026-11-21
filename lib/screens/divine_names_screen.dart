@@ -12,6 +12,13 @@ const _kAccent = Color(0xFF4CE0D2);
 const _kGold = Color(0xFFE8C27A);
 const _kTextDim = Color(0xFFB9BBD8);
 
+final _kTashkeel = RegExp('[ً-ْٰـ]');
+
+// Names are stored fully diacritized (e.g. "الرَّحْمَن"), but most people type
+// search queries without tashkeel — strip it from both sides so "الرحمن"
+// still matches.
+String _stripTashkeel(String s) => s.replaceAll(_kTashkeel, '');
+
 class DivineNamesScreen extends StatefulWidget {
   const DivineNamesScreen({super.key});
 
@@ -42,9 +49,24 @@ class _DivineNamesScreenState extends State<DivineNamesScreen> {
           }
           final all = DivineNamesRepository.instance.names;
           final q = _query.trim();
-          final filtered = q.isEmpty
-              ? all
-              : all.where((n) => n.name.contains(q) || n.meaning.contains(q) || n.effect.contains(q) || n.translit.toLowerCase().contains(q.toLowerCase())).toList();
+          final qNorm = _stripTashkeel(q);
+          List<DivineName> filtered;
+          if (qNorm.isEmpty) {
+            filtered = all;
+          } else {
+            // Name/transliteration matches are what someone is almost always
+            // looking for when they type a name — show only those when any
+            // exist, instead of drowning them in unrelated entries whose
+            // meaning/effect text happens to share a common descriptive word
+            // (e.g. searching "الواسع" used to also surface "الرحمن" and
+            // others, since "واسع" appears in their meaning text too).
+            final nameMatches = all
+                .where((n) => _stripTashkeel(n.name).contains(qNorm) || n.translit.toLowerCase().contains(q.toLowerCase()))
+                .toList();
+            filtered = nameMatches.isNotEmpty
+                ? nameMatches
+                : all.where((n) => n.meaning.contains(q) || n.effect.contains(q)).toList();
+          }
 
           return Column(
             children: [
