@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -248,13 +250,17 @@ class _QuranReaderScreenState extends State<QuranReaderScreen> {
       backgroundColor: _readingMode ? null : const Color(0xFFEDE6D6),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            child: Text(
-              'الجزء ${toEasternDigits(juz)} · ${hizbQuarterLabel(quarter)} من الحزب ${toEasternDigits(hizb)}',
-              style: Theme.of(context).textTheme.bodySmall,
+          // Mushaf Mode shows this on the page itself (see _MarginLabel) —
+          // matching the real Mushaf's own corner markers instead of
+          // duplicating the same info in the app's toolbar.
+          if (_readingMode)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Text(
+                'الجزء ${toEasternDigits(juz)} · ${hizbQuarterLabel(quarter)} من الحزب ${toEasternDigits(hizb)}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             ),
-          ),
           Expanded(
             child: Stack(
               children: [
@@ -427,7 +433,10 @@ class _QuranPageViewState extends State<_QuranPageView> {
           // ayahs exactly fill the card's content area — mirrors the padding
           // and footer sizing below so the measurement matches what's drawn.
           const scrollPadH = 18.0;
-          const scrollPadTop = 18.0;
+          // Taller than scrollPadBottom to reserve a clear header band for
+          // the decorative Juz/Hizb corner labels (see _MarginLabel) above
+          // the first line of text, so they never overlap it.
+          const scrollPadTop = 34.0;
           const scrollPadBottom = 8.0;
           final contentWidth = cardW - 2 * scrollPadH * scale;
           final footerHeight = _measureHeight(
@@ -446,20 +455,27 @@ class _QuranPageViewState extends State<_QuranPageView> {
             color: const Color(0xFF2B2117),
           );
 
+          final juz = QuranRepository.instance.juzForPage(page);
+          final (hizb, _) = QuranRepository.instance.hizbForPage(page);
+
           return Padding(
             padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-            child: Container(
-              width: cardW,
-              height: cardH,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFBF6E9),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: const Color(0xFFC9A96A), width: 1.4),
-                boxShadow: const [
-                  BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4)),
-                ],
-              ),
-              child: Column(
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                CustomPaint(
+                  foregroundPainter: _MushafFramePainter(scale: scale),
+                  child: Container(
+                    width: cardW,
+                    height: cardH,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFBF6E9),
+                      borderRadius: BorderRadius.circular(8 * scale),
+                      boxShadow: const [
+                        BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4)),
+                      ],
+                    ),
+                    child: Column(
                 children: [
                   Expanded(
                     child: SingleChildScrollView(
@@ -523,6 +539,19 @@ class _QuranPageViewState extends State<_QuranPageView> {
                   ),
                 ],
               ),
+                  ),
+                ),
+                Positioned(
+                  top: 9 * scale,
+                  right: 14 * scale,
+                  child: _MarginLabel(text: 'الجزء ${_arabicOrdinal(juz)}', scale: scale),
+                ),
+                Positioned(
+                  top: 9 * scale,
+                  left: 14 * scale,
+                  child: _MarginLabel(text: 'الحزب ${_arabicOrdinal(hizb)}', scale: scale),
+                ),
+              ],
             ),
           );
         },
@@ -583,14 +612,18 @@ class _SurahBanner extends StatelessWidget {
   final QuranSurah surah;
   final double scale;
 
+  static const _teal = Color(0xFF2F6F6B);
+  static const _gold = Color(0xFFC9A96A);
+  static const _cream = Color(0xFFFBF6E9);
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 10 * scale, horizontal: 12 * scale),
+      padding: EdgeInsets.symmetric(vertical: 10 * scale, horizontal: 14 * scale),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1E6C8),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: const Color(0xFFC9A96A), width: 1),
+        color: _teal,
+        borderRadius: BorderRadius.circular(6 * scale),
+        border: Border.all(color: _gold, width: 1 * scale),
       ),
       child: Row(
         children: [
@@ -598,15 +631,162 @@ class _SurahBanner extends StatelessWidget {
             child: Text(
               surah.name,
               textAlign: TextAlign.center,
-              style: GoogleFonts.amiriQuran(fontSize: 18 * scale, color: const Color(0xFF6B4F1D), fontWeight: FontWeight.bold),
+              style: GoogleFonts.amiriQuran(fontSize: 18 * scale, color: _cream, fontWeight: FontWeight.bold),
             ),
           ),
-          Text(
-            surah.revelationLabel,
-            style: TextStyle(fontSize: 11 * scale, color: const Color(0xFF6B4F1D)),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 7 * scale, vertical: 2.5 * scale),
+            decoration: BoxDecoration(
+              color: _gold,
+              borderRadius: BorderRadius.circular(4 * scale),
+            ),
+            child: Text(
+              surah.revelationLabel,
+              style: TextStyle(fontSize: 10.5 * scale, color: _teal, fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),
     );
   }
+}
+
+/// Small bordered marker reproducing a real Mushaf page's corner labels
+/// (e.g. "الجزء الأول" / "الحزب الأول") — see [_arabicOrdinal].
+class _MarginLabel extends StatelessWidget {
+  const _MarginLabel({required this.text, required this.scale});
+  final String text;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8 * scale, vertical: 3 * scale),
+      decoration: BoxDecoration(
+        color: _SurahBanner._teal,
+        borderRadius: BorderRadius.circular(4 * scale),
+        border: Border.all(color: _SurahBanner._gold, width: 1 * scale),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.amiriQuran(
+          fontSize: 10.5 * scale,
+          color: _SurahBanner._cream,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+}
+
+/// Converts 1-60 to an Arabic masculine ordinal ("الأول".."الستون") — enough
+/// to cover every Juz (1-30) and Hizb (1-60) number on a real Mushaf page.
+String _arabicOrdinal(int n) {
+  const units = [
+    '',
+    'الأول',
+    'الثاني',
+    'الثالث',
+    'الرابع',
+    'الخامس',
+    'السادس',
+    'السابع',
+    'الثامن',
+    'التاسع',
+  ];
+  const unitsCompound = [
+    '',
+    'الحادي',
+    'الثاني',
+    'الثالث',
+    'الرابع',
+    'الخامس',
+    'السادس',
+    'السابع',
+    'الثامن',
+    'التاسع',
+  ];
+  const teens = [
+    'العاشر',
+    'الحادي عشر',
+    'الثاني عشر',
+    'الثالث عشر',
+    'الرابع عشر',
+    'الخامس عشر',
+    'السادس عشر',
+    'السابع عشر',
+    'الثامن عشر',
+    'التاسع عشر',
+  ];
+  const tens = ['', '', 'العشرون', 'الثلاثون', 'الأربعون', 'الخمسون', 'الستون'];
+
+  if (n <= 9) return units[n];
+  if (n <= 19) return teens[n - 10];
+  if (n % 10 == 0) return tens[n ~/ 10];
+  return '${unitsCompound[n % 10]} و${tens[n ~/ 10]}';
+}
+
+/// Decorative double-line frame + corner rosettes drawn just inside the
+/// page card's edge, evoking the geometric border on a real printed
+/// Mushaf page (an original design in the same visual language, not a
+/// traced copy of any specific printed edition's artwork).
+class _MushafFramePainter extends CustomPainter {
+  const _MushafFramePainter({required this.scale});
+  final double scale;
+
+  static const _gold = Color(0xFFC9A96A);
+  static const _teal = Color(0xFF2F6F6B);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final outer = Offset.zero & size;
+
+    final outerRRect = RRect.fromRectAndRadius(outer.deflate(4 * scale), Radius.circular(6 * scale));
+    canvas.drawRRect(
+      outerRRect,
+      Paint()
+        ..color = _gold
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.4 * scale,
+    );
+
+    final innerRRect = RRect.fromRectAndRadius(outer.deflate(8.5 * scale), Radius.circular(4 * scale));
+    canvas.drawRRect(
+      innerRRect,
+      Paint()
+        ..color = _teal
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2 * scale,
+    );
+
+    final fill = Paint()..color = _gold;
+    final dot = Paint()..color = _teal;
+    for (final corner in [outer.topLeft, outer.topRight, outer.bottomLeft, outer.bottomRight]) {
+      final dx = corner.dx < size.width / 2 ? 1.0 : -1.0;
+      final dy = corner.dy < size.height / 2 ? 1.0 : -1.0;
+      final center = corner + Offset(6.5 * dx * scale, 6.5 * dy * scale);
+      _drawRosette(canvas, center, 6 * scale, fill, dot);
+    }
+  }
+
+  void _drawRosette(Canvas canvas, Offset center, double r, Paint fill, Paint dot) {
+    const points = 8;
+    final path = Path();
+    for (var i = 0; i < points * 2; i++) {
+      final radius = i.isEven ? r : r * 0.42;
+      final angle = (math.pi / points) * i;
+      final p = center + Offset(math.cos(angle) * radius, math.sin(angle) * radius);
+      if (i == 0) {
+        path.moveTo(p.dx, p.dy);
+      } else {
+        path.lineTo(p.dx, p.dy);
+      }
+    }
+    path.close();
+    canvas.drawPath(path, fill);
+    canvas.drawCircle(center, r * 0.28, dot);
+  }
+
+  @override
+  bool shouldRepaint(covariant _MushafFramePainter oldDelegate) => oldDelegate.scale != scale;
 }
