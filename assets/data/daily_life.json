@@ -14,7 +14,7 @@
           "repeatCount": {"type": "fixed", "n": 1},
           "occasion": "عند دخول المنزل",
           "tags": ["منزل", "بيت", "دخول المنزل"],
-          "sources": [{"sourceName": "سنن أبي داود", "hadithNumber": "5096", "authenticity": "hasan"}]
+          "sources": [{"sourceName": "سنن أبي داود", "hadithNumber": "5096", "authenticity": "scholarly_disagreement", "notes": "ضعّف الألباني إسناده في سنن أبي داود، وصحّحه آخرون؛ والمعنى صحيح ومتوافق مع عموم النصوص"}]
         },
         {
           "id": "home_02",

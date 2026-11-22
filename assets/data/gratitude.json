@@ -14,7 +14,7 @@
           "repeatCount": {"type": "fixed", "n": 1},
           "occasion": "عند سماع ما يَسُرّ أو حصول نعمة",
           "tags": ["شكر", "حمد", "خبر سار"],
-          "sources": [{"sourceName": "سنن ابن ماجه", "authenticity": "hasan"}]
+          "sources": [{"sourceName": "سنن ابن ماجه", "hadithNumber": "3803", "authenticity": "scholarly_disagreement", "notes": "ضعّفه بعض المحققين (منهم دار السلام)، وحسّنه آخرون؛ والمعنى صحيح ومتوافق مع عموم النصوص"}]
         },
         {
           "id": "gratitude_02",
