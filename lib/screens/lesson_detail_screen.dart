@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../data/lesson_sections.dart';
 import '../models/lesson.dart';
+import '../services/error_report.dart';
 import '../state/app_state.dart';
 import '../widgets/dark_mode_toggle.dart';
 
@@ -67,6 +68,11 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
             tooltip: 'إضافة إلى المفضلة',
             icon: Icon(appState.isFavorite(favId) ? Icons.bookmark_rounded : Icons.bookmark_border_rounded),
             onPressed: () => appState.toggleFavorite(favId),
+          ),
+          IconButton(
+            tooltip: 'الإبلاغ عن خطأ في هذا الدرس',
+            icon: const Icon(Icons.flag_outlined),
+            onPressed: () => reportContentError('${lesson.id} — ${lesson.title}'),
           ),
           const DarkModeToggle(),
         ],

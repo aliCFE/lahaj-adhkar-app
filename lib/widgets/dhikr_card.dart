@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../models/dhikr_item.dart';
 import '../models/source.dart';
+import '../services/error_report.dart';
 import '../state/app_state.dart';
 import '../theme/app_theme.dart';
 
@@ -46,6 +47,11 @@ class DhikrCard extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                         ),
                   ),
+                ),
+                IconButton(
+                  tooltip: 'الإبلاغ عن خطأ في هذا الذكر',
+                  icon: const Icon(Icons.flag_outlined),
+                  onPressed: () => reportContentError('${item.id} — ${item.occasion}'),
                 ),
                 IconButton(
                   icon: Icon(isFav ? Icons.favorite : Icons.favorite_border, color: Colors.redAccent),
