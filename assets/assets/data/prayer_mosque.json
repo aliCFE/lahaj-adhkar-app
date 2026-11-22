@@ -38,7 +38,7 @@
           "repeatCount": {"type": "fixed", "n": 1},
           "occasion": "عند الخروج من المسجد",
           "tags": ["مسجد"],
-          "sources": [{"sourceName": "صحيح مسلم", "hadithNumber": "713", "authenticity": "sahih"}]
+          "sources": [{"sourceName": "سنن أبي داود وابن ماجه", "authenticity": "hasan", "notes": "مطلع الدعاء (بسم الله، والصلاة والسلام على رسول الله)"}, {"sourceName": "صحيح مسلم", "hadithNumber": "713a", "authenticity": "sahih", "notes": "جملة 'اللهم إني أسألك من فضلك' نفسها"}]
         }
       ]
     },
